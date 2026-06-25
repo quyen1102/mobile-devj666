@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:lichess_mobile/src/styles/lichess_icons.dart';
-import 'package:lichess_mobile/src/styles/styles.dart';
+import 'package:nf_base/src/styles/lichess_icons.dart';
+import 'package:nf_base/src/styles/styles.dart';
 
 const _customOpacity = 0.6;
 

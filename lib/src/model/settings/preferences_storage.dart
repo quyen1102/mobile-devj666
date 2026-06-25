@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lichess_mobile/src/binding.dart';
-import 'package:lichess_mobile/src/model/auth/auth_controller.dart';
-import 'package:lichess_mobile/src/model/user/user.dart';
+import 'package:nf_base/src/binding.dart';
+import 'package:nf_base/src/model/auth/auth_controller.dart';
+import 'package:nf_base/src/model/user/user.dart';
 import 'package:logging/logging.dart';
 
 final _logger = Logger('PreferencesStorage');
@@ -15,22 +15,6 @@ abstract class Serializable {
 /// A preference category with its storage key
 enum PrefCategory {
   general('preferences.general'),
-  home('preferences.home'),
-  board('preferences.board'),
-  analysis('preferences.analysis'),
-  study('preferences.study'),
-  overTheBoard('preferences.overTheBoard'),
-  challenge('preferences.challenge'),
-  gameSetup('preferences.gameSetup'),
-  gameSeeks('preferences.gameSeeks'),
-  game('preferences.game'),
-  coordinateTraining('preferences.coordinateTraining'),
-  openingExplorer('preferences.opening_explorer'),
-  gameHistory('preferences.gameHistory'),
-  puzzle('preferences.puzzle'),
-  broadcast('preferences.broadcast'),
-  engineEvaluation('preferences.engineEvaluation'),
-  offlineComputerGame('preferences.offlineComputerGame'),
   log('preferences.log');
 
   const PrefCategory(this.storageKey);

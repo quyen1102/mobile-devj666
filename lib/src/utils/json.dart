@@ -3,7 +3,6 @@ import 'dart:ui' show Color, Locale;
 import 'package:deep_pick/deep_pick.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:lichess_mobile/src/model/common/uci.dart';
 import 'package:logging/logging.dart';
 
 final _logger = Logger('JsonUtils');
@@ -82,37 +81,7 @@ class ColorConverter implements JsonConverter<Color?, Map<String, dynamic>?> {
   }
 }
 
-extension UciExtension on Pick {
-  /// Matches a UciCharPair from a string.
-  UciCharPair asUciCharPairOrThrow() {
-    final value = required().asStringOrThrow();
-    return UciCharPair.fromStringId(value);
-  }
-
-  UciCharPair? asUciCharPairOrNull() {
-    if (value == null) return null;
-    try {
-      return asUciCharPairOrThrow();
-    } catch (_) {
-      return null;
-    }
-  }
-
-  /// Matches a UciPath from a string.
-  UciPath asUciPathOrThrow() {
-    final value = required().asStringOrThrow();
-    return UciPath(value);
-  }
-
-  UciPath? asUciPathOrNull() {
-    if (value == null) return null;
-    try {
-      return asUciPathOrThrow();
-    } catch (_) {
-      return null;
-    }
-  }
-}
+// Removed UciExtension
 
 extension TimeExtension on Pick {
   /// Matches a DateTime from milliseconds since unix epoch.

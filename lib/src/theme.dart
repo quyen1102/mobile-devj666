@@ -1,17 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lichess_mobile/src/constants.dart';
-import 'package:lichess_mobile/src/model/settings/board_preferences.dart';
-import 'package:lichess_mobile/src/model/settings/general_preferences.dart';
-import 'package:lichess_mobile/src/styles/styles.dart';
-import 'package:lichess_mobile/src/utils/color_palette.dart';
+import 'package:nf_base/src/constants.dart';
+import 'package:nf_base/src/model/settings/general_preferences.dart';
+import 'package:nf_base/src/styles/styles.dart';
+import 'package:nf_base/src/utils/color_palette.dart';
 
 const kSliderTheme = SliderThemeData(
   // ignore: deprecated_member_use
   year2023: false,
 );
 
-ThemeData makeAppTheme(BuildContext context, GeneralPrefs generalPrefs, BoardPrefs boardPrefs) {
+ThemeData makeAppTheme(BuildContext context, GeneralPrefs generalPrefs) {
   final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
   final brightness = generalPrefs.isForcedDarkMode
       ? Brightness.dark
@@ -22,7 +21,7 @@ ThemeData makeAppTheme(BuildContext context, GeneralPrefs generalPrefs, BoardPre
         };
 
   if (generalPrefs.backgroundColor == null && generalPrefs.backgroundImage == null) {
-    return _makeDefaultTheme(brightness, generalPrefs, boardPrefs, isIOS);
+    return _makeDefaultTheme(brightness, generalPrefs, isIOS);
   } else {
     return _makeBackgroundImageTheme(
       baseTheme:
@@ -38,7 +37,7 @@ ThemeData makeAppTheme(BuildContext context, GeneralPrefs generalPrefs, BoardPre
   }
 }
 
-/// A custom theme extension that adds lichess custom properties to the theme.
+/// A custom theme extension that adds custom properties to the theme.
 @immutable
 class CustomTheme extends ThemeExtension<CustomTheme> {
   const CustomTheme({required this.rowEven, required this.rowOdd});
@@ -63,14 +62,14 @@ class CustomTheme extends ThemeExtension<CustomTheme> {
   }
 }
 
-/// A [BuildContext] extension that provides the [lichessTheme] property.
+/// A [BuildContext] extension that provides the [customTheme] property.
 extension CustomThemeBuildContext on BuildContext {
-  CustomTheme get _defaultLichessTheme => CustomTheme(
+  CustomTheme get _defaultTheme => CustomTheme(
     rowEven: ColorScheme.of(this).surfaceContainer,
     rowOdd: ColorScheme.of(this).surfaceContainerLow,
   );
 
-  CustomTheme get lichessTheme => Theme.of(this).extension<CustomTheme>() ?? _defaultLichessTheme;
+  CustomTheme get customTheme => Theme.of(this).extension<CustomTheme>() ?? _defaultTheme;
 }
 
 // --
@@ -78,10 +77,9 @@ extension CustomThemeBuildContext on BuildContext {
 ThemeData _makeDefaultTheme(
   Brightness brightness,
   GeneralPrefs generalPrefs,
-  BoardPrefs boardPrefs,
   bool isIOS,
 ) {
-  final boardTheme = boardPrefs.boardTheme;
+  const brandSeedColor = Color(0xFF2196F3);
   final dynamicColorSchemes = getDynamicColorSchemes();
   final systemScheme = switch (brightness) {
     Brightness.light => dynamicColorSchemes?.light,
@@ -90,12 +88,12 @@ ThemeData _makeDefaultTheme(
   final hasSystemColors = systemScheme != null && generalPrefs.systemColors == true;
 
   final neutralScheme = ColorScheme.fromSeed(
-    seedColor: boardTheme.colors.darkSquare,
+    seedColor: brandSeedColor,
     brightness: brightness,
     dynamicSchemeVariant: DynamicSchemeVariant.neutral,
   );
   final defaultScheme = ColorScheme.fromSeed(
-    seedColor: boardTheme.colors.darkSquare,
+    seedColor: brandSeedColor,
     brightness: brightness,
   );
   // makes a theme with neutral surfaces and default colors

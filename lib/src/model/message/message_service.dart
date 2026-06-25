@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lichess_mobile/src/model/common/id.dart';
-import 'package:lichess_mobile/src/model/message/message_repository.dart';
-import 'package:lichess_mobile/src/model/notifications/notification_service.dart';
-import 'package:lichess_mobile/src/model/notifications/notifications.dart';
-import 'package:lichess_mobile/src/model/user/user_repository.dart';
-import 'package:lichess_mobile/src/tab_scaffold.dart';
-import 'package:lichess_mobile/src/view/message/conversation_screen.dart';
+import 'package:nf_base/src/model/common/id.dart';
+import 'package:nf_base/src/model/message/message_repository.dart';
+import 'package:nf_base/src/model/notifications/notification_service.dart';
+import 'package:nf_base/src/model/notifications/notifications.dart';
+import 'package:nf_base/src/tab_scaffold.dart';
+import 'package:nf_base/src/view/message/conversation_screen.dart';
+import 'package:nf_base/src/model/user/user.dart';
 
 /// A provider for [MessageService].
 final messageServiceProvider = Provider<MessageService>((Ref ref) {
@@ -50,13 +50,6 @@ class MessageService {
 
   /// Handles a notification response that caused the app to open.
   Future<void> _onNotificationResponse(UserId conversationId) async {
-    final user = await ref.read(userRepositoryProvider).getUser(conversationId);
-
-    if (user.kid == true) {
-      // If the user is in kid mode, we don't open the conversation screen.
-      return;
-    }
-
     final context = ref.read(currentNavigatorKeyProvider).currentContext;
     if (context == null || !context.mounted) return;
 
@@ -68,7 +61,11 @@ class MessageService {
     Navigator.of(
       context,
       rootNavigator: true,
-    ).push(ConversationScreen.buildRoute(user: user.lightUser));
+    ).push(
+      ConversationScreen.buildRoute(
+        user: LightUser(id: conversationId, name: conversationId.value),
+      ),
+    );
   }
 
   void dispose() {

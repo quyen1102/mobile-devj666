@@ -1,12 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:lichess_mobile/src/styles/lichess_icons.dart';
-import 'package:lichess_mobile/src/utils/l10n_context.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class AppBarLichessTitle extends StatelessWidget {
-  const AppBarLichessTitle({super.key, this.iconSize = 24});
+class AppBarAppTitle extends StatelessWidget {
+  const AppBarAppTitle({super.key, this.iconSize = 24});
 
   final double iconSize;
 
@@ -16,10 +14,10 @@ class AppBarLichessTitle extends StatelessWidget {
       TextSpan(
         children: [
           WidgetSpan(
-            alignment: .bottom,
-            child: Icon(LichessIcons.logo_lichess, size: iconSize),
+            alignment: PlaceholderAlignment.bottom,
+            child: Icon(Icons.rocket_launch, size: iconSize),
           ),
-          const TextSpan(text: ' lichess'),
+          const TextSpan(text: ' BaseApp'),
           TextSpan(
             text: '.org',
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
@@ -61,17 +59,17 @@ class AppBarTitleText extends StatelessWidget {
   }
 }
 
-class LichessMessage extends StatefulWidget {
-  const LichessMessage({super.key, this.style, this.textAlign = TextAlign.start});
+class AppMessage extends StatefulWidget {
+  const AppMessage({super.key, this.style, this.textAlign = TextAlign.start});
 
   final TextStyle? style;
   final TextAlign textAlign;
 
   @override
-  State<LichessMessage> createState() => _LichessMessageState();
+  State<AppMessage> createState() => _AppMessageState();
 }
 
-class _LichessMessageState extends State<LichessMessage> {
+class _AppMessageState extends State<AppMessage> {
   late TapGestureRecognizer _recognizer;
 
   @override
@@ -87,28 +85,21 @@ class _LichessMessageState extends State<LichessMessage> {
   }
 
   void _handleTap() {
-    launchUrl(Uri.parse('https://lichess.org/features'));
+    launchUrl(Uri.parse('https://example.com'));
   }
 
   @override
   Widget build(BuildContext context) {
-    final trans = context.l10n.xIsAFreeYLibreOpenSourceChessServer('Lichess', context.l10n.really);
-    final regexp = RegExp(r'''^([^(]*\()([^)]*)(\).*)$''');
-    final match = regexp.firstMatch(trans);
-    final List<TextSpan> spans = [];
-    if (match != null) {
-      for (var i = 1; i <= match.groupCount; i++) {
-        spans.add(
-          TextSpan(
-            text: match[i],
-            style: i == 2 ? TextStyle(color: ColorScheme.of(context).primary) : null,
-            recognizer: i == 2 ? _recognizer : null,
-          ),
-        );
-      }
-    } else {
-      spans.add(TextSpan(text: trans));
-    }
+    final trans = 'Welcome to the Base App';
+    final spans = [
+      TextSpan(text: trans),
+      const TextSpan(text: ' '),
+      TextSpan(
+        text: '(Learn more)',
+        style: TextStyle(color: ColorScheme.of(context).primary),
+        recognizer: _recognizer,
+      ),
+    ];
 
     return MergeSemantics(
       child: Text.rich(

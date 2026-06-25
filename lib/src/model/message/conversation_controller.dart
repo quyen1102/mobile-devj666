@@ -2,16 +2,14 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:lichess_mobile/src/model/auth/auth_controller.dart';
-import 'package:lichess_mobile/src/model/common/id.dart';
-import 'package:lichess_mobile/src/model/common/socket.dart';
-import 'package:lichess_mobile/src/model/message/message.dart';
-import 'package:lichess_mobile/src/model/message/message_repository.dart';
-import 'package:lichess_mobile/src/model/relation/relation_repository.dart';
-import 'package:lichess_mobile/src/model/user/user.dart';
-import 'package:lichess_mobile/src/model/user/user_repository.dart';
-import 'package:lichess_mobile/src/network/socket.dart';
-import 'package:lichess_mobile/src/utils/rate_limit.dart';
+import 'package:nf_base/src/model/auth/auth_controller.dart';
+import 'package:nf_base/src/model/common/id.dart';
+import 'package:nf_base/src/model/common/socket.dart';
+import 'package:nf_base/src/model/message/message.dart';
+import 'package:nf_base/src/model/message/message_repository.dart';
+import 'package:nf_base/src/model/user/user.dart';
+import 'package:nf_base/src/network/socket.dart';
+import 'package:nf_base/src/utils/rate_limit.dart';
 
 part 'conversation_controller.freezed.dart';
 
@@ -52,8 +50,6 @@ class ConversationController extends AsyncNotifier<ConversationState> {
 
     final repo = ref.read(messageRepositoryProvider);
     final convoData = await repo.loadConvo(userId);
-    final userRepo = ref.read(userRepositoryProvider);
-    final userData = await userRepo.getUser(userId);
     final oldFirstMsg = convoData.convo.messages.length >= kMessagesPerPage
         ? convoData.convo.messages[kMessagesPerPage - 1]
         : null;
@@ -63,7 +59,7 @@ class ConversationController extends AsyncNotifier<ConversationState> {
       isBot: convoData.isBot,
       convo: convoData.convo,
       canGetMoreSince: oldFirstMsg?.date,
-      isBlocked: userData.blocking ?? false,
+      isBlocked: false,
     );
   }
 
@@ -108,7 +104,8 @@ class ConversationController extends AsyncNotifier<ConversationState> {
   }
 
   Future<void> deleteThread() async {
-    await ref.read(relationRepositoryProvider).deleteThread(userId);
+    // Mock delete thread
+    await Future<void>.delayed(const Duration(milliseconds: 100));
   }
 
   void _connectSocket() {

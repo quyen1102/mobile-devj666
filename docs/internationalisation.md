@@ -1,80 +1,44 @@
 # Internationalisation
 
-We're using the official Flutter way of internationalising our app, as desbribed in the
-[documentation](https://docs.flutter.dev/ui/accessibility-and-internationalization/internationalization#setting-up).
+We are using the official Flutter way of internationalising our app, as described in the [documentation](https://docs.flutter.dev/ui/accessibility-and-internationalization/internationalization#setting-up).
 
-What is specific to this project is the way the ARB files are generated.
+In this generic starter template, translations are defined locally.
 
-Lichess translations are managed in [Crowdin lichess project](https://crowdin.com/project/lichess).
+ARB files are located in the `lib/l10n/` directory (e.g., `app_en.arb`, `app_vi.arb`). 
 
-Crowdin translations (and sources) are located in the `translation/` directory. New
-translations (and lila sources) are regularly fetched from crowdin by a github action.
+To generate translation Dart classes from ARB files, run:
+```bash
+flutter gen-l10n
+```
 
-ARB files are generated with a script that processes these translations: `scripts/gen-arb.mjs`.
+If you are using the native iOS widget extension, a helper script, `scripts/gen-widget-strings.mjs`, generates `ios/LichessWidgets/Localizable.xcstrings` from the translations to enable internationalisation of the SwiftUI widgets.
 
-Then a flutter command is used to generate the dart files from the ARB files.
-
-A third script, `scripts/gen-widget-strings.mjs`, generates `ios/LichessWidgets/Localizable.xcstrings`
-— a String Catalog used by the native iOS widget extension to translate its UI strings. See
-[ios/EXTENSIONS.md](../ios/EXTENSIONS.md#internationalisation) for details on adding new widget strings.
-
-All three steps are combined in a single script:
-
+All translation compilation steps are combined in a single shell script:
 ```bash
 ./scripts/gen-translations.sh
 ```
 
-## How to add new translations
+---
 
-[Translations in Crowdin](../translation/sources) are organised by module.
+## How to Add New Translations
 
-There is one module for the mobile app: [mobile.xml](../translation/source/mobile.xml).
+To add a new translation string:
+1. Open `lib/l10n/app_en.arb`.
+2. Add your key and value (following ARB file format guidelines).
+3. If necessary, add translations for other locales in their corresponding `.arb` files.
+4. Run `flutter gen-l10n` to compile.
 
-We can edit this file to add new translations that are specific to the mobile
-app. It will be automatically synced with Crowdin when changes are pushed to the
-file.
-
-All the other modules comes from [lila](https://github.com/lichess-org/lila/tree/master/translation/source) repository. They are pulled from crowdin and should **NOT** be edited.
-We are not using all the lila modules, and the list of modules is defined in the
-`scripts/gen-arb.mjs` script.
-
-If you need to add a new module, you need to add it to the list of modules in the script.
-
-Note that a module can contain a lot of translations that we don't need in the app. In this case, you can filter the translations by adding the module to the `whitelist` defined in the script.
-
-Once you've added the module to the script, you can run the script to update the translations.
-
+### Local XML translation system (Optional)
+The codebase includes legacy scripts (`scripts/gen-arb.mjs`) that process translations from XML files in the `translation/` directory. If you prefer to manage translations in XML format, you can edit `translation/source/mobile.xml` and then run:
 ```bash
 ./scripts/gen-translations.sh
 ```
 
-You should see the new strings in the `lib/l10n/app_*.arb` and `lib/l10n/app_*.dart` files.
+---
 
-### Mobile translations tips
-
-> **Note**
->
-> When working on a new feature, you should start with hardcoding English texts first. Once the feature is done,
-> released and even used for a while, we can add translations, in order to avoid useless translating work.
-
-There are some strings that appear only in this app, but not on lichess.org.
-
-If you have a new string to be translated, add it to `translations/source/mobile.xml`. Make sure to include a `comment`
-attribute, describing the usage of the string and its contents (e.g. placeholders). Some strings also must not exceed a
-certain width due to UI constraints, use the `maxLength` attribute for that.
-
-After updating translations as
-described above, they can be used like the other translations, however a `mobile` prefix is added in dart. For example,
-"foo" in `mobile.xml` turns into `mobileFoo` in dart.
+## Developer Tips
 
 > **Note**
->
-> We do not translate error messages that are not critically important, such as "could not load XY" when screen "XY"
-> failed to load. Translating work is done by a team of volunteers and we try to focus on quality rather than quantity.
-> Such messages are mostly edge cases in the sense they should be rarely seen and people would understand that something
-> went wrong and could not load without understanding the actual meaning of the error message.
+> When working on a new feature, start by hardcoding English texts first. Once the feature is completed and verified, add them to `app_en.arb` to keep translation maintenance organized.
 
-> **Note**
-> Do not translate names such as "Puzzle Storm" and "Puzzle Streak". If such names appear in a translation string,
-> add a comment that they should not be translated.
-
+For keys in `mobile.xml` (if using the XML-based pipeline), a `mobile` prefix is added in Dart (e.g. `foo` turns into `mobileFoo` in code).

@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lichess_mobile/src/model/auth/auth_controller.dart';
-import 'package:lichess_mobile/src/model/common/id.dart';
-import 'package:lichess_mobile/src/model/message/message.dart';
-import 'package:lichess_mobile/src/network/aggregator.dart';
-import 'package:lichess_mobile/src/network/http.dart';
+import 'package:nf_base/src/model/auth/auth_controller.dart';
+import 'package:nf_base/src/model/common/id.dart';
+import 'package:nf_base/src/model/message/message.dart';
+import 'package:nf_base/src/network/aggregator.dart';
+import 'package:nf_base/src/network/http.dart';
 
 /// A provider that gets the conversation data for the current user.
 final contactsProvider = FutureProvider.autoDispose<Contacts>((ref) {

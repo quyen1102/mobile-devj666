@@ -2,20 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:lichess_mobile/src/app_links_service.dart';
-import 'package:lichess_mobile/src/model/message/conversation_controller.dart';
-import 'package:lichess_mobile/src/model/message/message.dart';
-import 'package:lichess_mobile/src/model/message/message_repository.dart';
-import 'package:lichess_mobile/src/model/user/user.dart';
-import 'package:lichess_mobile/src/styles/styles.dart';
-import 'package:lichess_mobile/src/tab_scaffold.dart';
-import 'package:lichess_mobile/src/utils/l10n_context.dart';
-import 'package:lichess_mobile/src/utils/navigation.dart';
-import 'package:lichess_mobile/src/view/chat/chat_context_menu.dart';
-import 'package:lichess_mobile/src/view/user/user_or_profile_screen.dart';
-import 'package:lichess_mobile/src/widgets/platform.dart';
-import 'package:lichess_mobile/src/widgets/user.dart';
-import 'package:lichess_mobile/src/widgets/yes_no_dialog.dart';
+import 'package:nf_base/src/app_links_service.dart';
+import 'package:nf_base/src/model/message/conversation_controller.dart';
+import 'package:nf_base/src/model/message/message.dart';
+import 'package:nf_base/src/model/message/message_repository.dart';
+import 'package:nf_base/src/model/user/user.dart';
+import 'package:nf_base/src/styles/styles.dart';
+import 'package:nf_base/src/tab_scaffold.dart';
+import 'package:nf_base/src/utils/l10n_context.dart';
+import 'package:flutter/services.dart';
+import 'package:nf_base/src/utils/navigation.dart';
+import 'package:nf_base/src/widgets/feedback.dart';
+import 'package:nf_base/src/widgets/platform.dart';
+import 'package:nf_base/src/widgets/yes_no_dialog.dart';
 
 sealed class DisplayItem {}
 
@@ -87,18 +86,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> with Ro
         titleSpacing: 0,
         title: ListTile(
           contentPadding: EdgeInsets.zero,
-          leading: UserAvatar(widget.user, radius: 16),
-          title: UserFullNameWidget(user: widget.user, showFlair: false),
-          subtitle: Text(widget.user.isOnline == true ? context.l10n.online : context.l10n.offline),
-          onTap: () {
-            Navigator.push(context, UserOrProfileScreen.buildRoute(widget.user))
-            // invalidate to refresh potential blocking status change
-            .then((_) {
-              if (context.mounted) {
-                ref.invalidate(conversationControllerProvider(widget.user.id));
-              }
-            });
-          },
+          leading: CircleAvatar(
+            radius: 16,
+            child: Text(widget.user.name[0].toUpperCase()),
+          ),
+          title: Text(widget.user.name),
         ),
         actions: [
           if (canInteract)
@@ -362,8 +354,11 @@ class _MessageBubble extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final time = DateFormat.Hm().format(message.date);
 
-    return ChatBubbleContextMenu(
-      message: message.text,
+    return GestureDetector(
+      onLongPress: () {
+        Clipboard.setData(ClipboardData(text: message.text));
+        showSnackBar(context, 'Message copied to clipboard');
+      },
       child: FractionallySizedBox(
         alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
         widthFactor: 0.85,

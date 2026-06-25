@@ -2,19 +2,18 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:lichess_mobile/src/model/auth/auth_controller.dart';
-import 'package:lichess_mobile/src/model/message/message.dart';
-import 'package:lichess_mobile/src/model/message/message_repository.dart';
-import 'package:lichess_mobile/src/model/user/user.dart';
-import 'package:lichess_mobile/src/utils/l10n.dart';
-import 'package:lichess_mobile/src/utils/l10n_context.dart';
-import 'package:lichess_mobile/src/utils/navigation.dart';
-import 'package:lichess_mobile/src/utils/rate_limit.dart';
-import 'package:lichess_mobile/src/view/message/conversation_screen.dart';
-import 'package:lichess_mobile/src/widgets/haptic_refresh_indicator.dart';
-import 'package:lichess_mobile/src/widgets/list.dart';
-import 'package:lichess_mobile/src/widgets/platform_search_bar.dart';
-import 'package:lichess_mobile/src/widgets/user.dart';
+import 'package:nf_base/src/model/auth/auth_controller.dart';
+import 'package:nf_base/src/model/message/message.dart';
+import 'package:nf_base/src/model/message/message_repository.dart';
+import 'package:nf_base/src/model/user/user.dart';
+import 'package:nf_base/src/utils/l10n.dart';
+import 'package:nf_base/src/utils/l10n_context.dart';
+import 'package:nf_base/src/utils/navigation.dart';
+import 'package:nf_base/src/utils/rate_limit.dart';
+import 'package:nf_base/src/view/message/conversation_screen.dart';
+import 'package:nf_base/src/widgets/haptic_refresh_indicator.dart';
+import 'package:nf_base/src/widgets/list.dart';
+import 'package:nf_base/src/widgets/platform_search_bar.dart';
 
 final messageSearchQueryProvider = StateProvider.autoDispose<String>((ref) => '');
 
@@ -186,11 +185,13 @@ class ContactTile extends StatelessWidget {
       contentPadding: Theme.of(
         context,
       ).listTileTheme.contentPadding?.add(const EdgeInsets.symmetric(vertical: 4.0)),
-      leading: UserAvatar(contact.user),
-      title: UserFullNameWidget(user: contact.user, showFlair: false, showPatron: true),
+      leading: CircleAvatar(
+        child: Text(contact.user.name[0].toUpperCase()),
+      ),
+      title: Text(contact.user.name),
       subtitle: Text(contact.lastMessage.text),
       trailing: Column(
-        mainAxisSize: .min,
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(
@@ -224,7 +225,7 @@ class UserTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
-      title: UserFullNameWidget(user: user, showFlair: true, showPatron: true),
+      title: Text(user.name),
       onTap: () => openConvo(user),
     );
   }

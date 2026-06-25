@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lichess_mobile/src/styles/styles.dart';
-import 'package:lichess_mobile/src/widgets/list.dart';
+import 'package:nf_base/src/styles/styles.dart';
+import 'package:nf_base/src/widgets/list.dart';
 
 const kSettingsTileTitleMaxLines = 3;
 

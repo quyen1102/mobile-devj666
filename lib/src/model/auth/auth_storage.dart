@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lichess_mobile/src/constants.dart';
-import 'package:lichess_mobile/src/db/secure_storage.dart';
-import 'package:lichess_mobile/src/model/auth/auth_controller.dart';
+import 'package:nf_base/src/constants.dart';
+import 'package:nf_base/src/db/secure_storage.dart';
+import 'package:nf_base/src/model/auth/auth_controller.dart';
 
 const kAuthStorageKey = '$kLichessHost.userSession';
 

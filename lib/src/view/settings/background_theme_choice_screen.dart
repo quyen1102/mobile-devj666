@@ -2,23 +2,19 @@ import 'dart:io';
 import 'dart:math' show max;
 import 'dart:ui' as ui;
 
-import 'package:chessground/chessground.dart';
-import 'package:dartchess/dartchess.dart' show Side, kInitialFEN;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lichess_mobile/src/model/common/chess.dart';
-import 'package:lichess_mobile/src/model/common/preloaded_data.dart';
-import 'package:lichess_mobile/src/model/settings/board_preferences.dart';
-import 'package:lichess_mobile/src/model/settings/general_preferences.dart';
-import 'package:lichess_mobile/src/styles/styles.dart';
-import 'package:lichess_mobile/src/utils/image.dart';
-import 'package:lichess_mobile/src/utils/l10n_context.dart';
-import 'package:lichess_mobile/src/utils/navigation.dart';
-import 'package:lichess_mobile/src/widgets/background.dart';
-import 'package:lichess_mobile/src/widgets/list.dart';
-import 'package:lichess_mobile/src/widgets/settings.dart';
+import 'package:nf_base/src/model/common/preloaded_data.dart';
+import 'package:nf_base/src/model/settings/general_preferences.dart';
+import 'package:nf_base/src/styles/styles.dart';
+import 'package:nf_base/src/utils/image.dart';
+import 'package:nf_base/src/utils/l10n_context.dart';
+import 'package:nf_base/src/utils/navigation.dart';
+import 'package:nf_base/src/widgets/background.dart';
+import 'package:nf_base/src/widgets/list.dart';
+import 'package:nf_base/src/widgets/settings.dart';
 import 'package:material_color_utilities/score/score.dart';
 import 'package:path/path.dart';
 
@@ -48,7 +44,6 @@ class _Body extends ConsumerWidget {
         .read(preloadedDataProvider)
         .requireValue
         .appDocumentsDirectory;
-    final boardPrefs = ref.watch(boardPreferencesProvider);
 
     final viewport = MediaQuery.sizeOf(context);
     final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
@@ -100,7 +95,6 @@ class _Body extends ConsumerWidget {
                           .push(
                             MaterialPageRoute<BackgroundImage?>(
                               builder: (_) => ConfirmImageBackgroundScreen(
-                                boardPrefs: boardPrefs,
                                 image: image,
                                 baseColor: baseColor,
                                 meanLuminance: meanLuminance,
@@ -156,7 +150,6 @@ class _Body extends ConsumerWidget {
                       .push(
                         MaterialPageRoute<(int, bool)?>(
                           builder: (_) => ConfirmColorBackgroundScreen(
-                            boardPrefs: boardPrefs,
                             initialIndex: index,
                           ),
                           fullscreenDialog: true,
@@ -189,12 +182,10 @@ class _Body extends ConsumerWidget {
 class ConfirmColorBackgroundScreen extends StatefulWidget {
   const ConfirmColorBackgroundScreen({
     required this.initialIndex,
-    required this.boardPrefs,
     super.key,
   });
 
   final int initialIndex;
-  final BoardPrefs boardPrefs;
 
   @override
   State<ConfirmColorBackgroundScreen> createState() => _ConfirmColorBackgroundScreenState();
@@ -257,14 +248,23 @@ class _ConfirmColorBackgroundScreenState extends State<ConfirmColorBackgroundScr
                         padding: EdgeInsets.only(
                           left: orientation == Orientation.portrait ? 0 : 16.0,
                         ),
-                        child: StaticChessboard(
-                          size: orientation == Orientation.portrait
-                              ? constraints.maxWidth
+                        child: Container(
+                          width: orientation == Orientation.portrait
+                              ? constraints.maxWidth * 0.8
                               : constraints.maxHeight - landscapeBoardPadding * 2,
-                          fen: kInitialFEN,
-                          orientation: Side.white,
-                          settings: StaticChessboardSettings.fromBoardSettings(
-                            widget.boardPrefs.toBoardSettings(Variant.standard),
+                          height: orientation == Orientation.portrait
+                              ? constraints.maxWidth * 0.8
+                              : constraints.maxHeight - landscapeBoardPadding * 2,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.white24),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "Preview",
+                              style: TextStyle(color: Colors.white70),
+                            ),
                           ),
                         ),
                       ),
@@ -308,7 +308,6 @@ class _ConfirmColorBackgroundScreenState extends State<ConfirmColorBackgroundScr
 class ConfirmImageBackgroundScreen extends StatefulWidget {
   const ConfirmImageBackgroundScreen({
     required this.image,
-    required this.boardPrefs,
     required this.meanLuminance,
     required this.baseColor,
     required this.imageSize,
@@ -318,7 +317,6 @@ class ConfirmImageBackgroundScreen extends StatefulWidget {
   });
 
   final XFile image;
-  final BoardPrefs boardPrefs;
   final Color baseColor;
   final double meanLuminance;
   final Size imageSize;
@@ -434,14 +432,23 @@ class _ConfirmImageBackgroundScreenState extends State<ConfirmImageBackgroundScr
                       padding: EdgeInsets.only(
                         left: widget.viewportOrientation == Orientation.portrait ? 0 : 16.0,
                       ),
-                      child: StaticChessboard(
-                        size: widget.viewportOrientation == Orientation.portrait
-                            ? widget.viewport.width
+                      child: Container(
+                        width: widget.viewportOrientation == Orientation.portrait
+                            ? widget.viewport.width * 0.8
                             : widget.viewport.height - landscapeBoardPadding * 2,
-                        fen: kInitialFEN,
-                        orientation: Side.white,
-                        settings: StaticChessboardSettings.fromBoardSettings(
-                          widget.boardPrefs.toBoardSettings(Variant.standard),
+                        height: widget.viewportOrientation == Orientation.portrait
+                            ? widget.viewport.width * 0.8
+                            : widget.viewport.height - landscapeBoardPadding * 2,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Preview",
+                            style: TextStyle(color: Colors.white70),
+                          ),
                         ),
                       ),
                     ),

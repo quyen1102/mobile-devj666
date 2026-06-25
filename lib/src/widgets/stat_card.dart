@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lichess_mobile/src/styles/styles.dart';
+import 'package:nf_base/src/styles/styles.dart';
 
 const _customOpacity = 0.6;
 const _defaultStatFontSize = 12.0;

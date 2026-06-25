@@ -21,7 +21,7 @@ import UIKit
 public final class SharePlugin: NSObject, FlutterPlugin, FlutterStreamHandler,
   FlutterSceneLifeCycleDelegate
 {
-  private static let appGroupId = "group.org.lichess.mobileV2.share"
+  private static let appGroupId = "group.com.example.base.share"
   private static let lichessScheme = "org.lichess.mobile"
   private static let sharedPgnHost = "shared-pgn"
   private static let sharedFileName = "shared.pgn"

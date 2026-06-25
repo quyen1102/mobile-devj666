@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:lichess_mobile/src/network/connectivity.dart';
-import 'package:lichess_mobile/src/network/socket.dart';
-import 'package:lichess_mobile/src/styles/styles.dart';
-import 'package:lichess_mobile/src/utils/l10n_context.dart';
-import 'package:lichess_mobile/src/widgets/buttons.dart';
+import 'package:nf_base/src/network/connectivity.dart';
+import 'package:nf_base/src/network/socket.dart';
+import 'package:nf_base/src/styles/styles.dart';
+import 'package:nf_base/src/utils/l10n_context.dart';
+import 'package:nf_base/src/widgets/buttons.dart';
 import 'package:popover/popover.dart';
 import 'package:signal_strength_indicator/signal_strength_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';

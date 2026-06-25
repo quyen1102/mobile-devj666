@@ -5,18 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:lichess_mobile/l10n/l10n.dart';
-import 'package:lichess_mobile/src/binding.dart';
-import 'package:lichess_mobile/src/constants.dart';
-import 'package:lichess_mobile/src/db/secure_storage.dart';
-import 'package:lichess_mobile/src/model/notifications/notification_service.dart';
-import 'package:lichess_mobile/src/model/notifications/notifications.dart';
-import 'package:lichess_mobile/src/model/settings/board_preferences.dart';
-import 'package:lichess_mobile/src/model/settings/preferences_storage.dart';
-import 'package:lichess_mobile/src/utils/chessboard.dart';
-import 'package:lichess_mobile/src/utils/color_palette.dart';
-import 'package:lichess_mobile/src/utils/screen.dart';
-import 'package:lichess_mobile/src/utils/string.dart';
+import 'package:nf_base/l10n/l10n.dart';
+import 'package:nf_base/src/binding.dart';
+import 'package:nf_base/src/constants.dart';
+import 'package:nf_base/src/db/secure_storage.dart';
+import 'package:nf_base/src/model/notifications/notification_service.dart';
+import 'package:nf_base/src/utils/color_palette.dart';
+import 'package:nf_base/src/utils/screen.dart';
+import 'package:nf_base/src/utils/string.dart';
 import 'package:logging/logging.dart';
 import 'package:material_color_utilities/palettes/core_palette.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -42,12 +38,6 @@ Future<void> initializeApp() async {
       _logger.info('Generated new SRI: $sri');
       await SecureStorage.instance.write(key: kSRIStorageKey, value: sri);
 
-      // on android 12+ set board theme to system colors
-      if (getCorePalette() != null) {
-        final boardPrefs = BoardPrefs.defaults.copyWith(boardTheme: BoardTheme.system);
-        await prefs.setString(PrefCategory.board.storageKey, jsonEncode(boardPrefs.toJson()));
-      }
-
       _logger.info('First run initialization completed.');
     }
 
@@ -67,38 +57,17 @@ Future<void> initializeApp() async {
 }
 
 Future<void> initializeLocalNotifications(Locale locale) async {
-  final l10n = await AppLocalizations.delegate.load(locale);
   await FlutterLocalNotificationsPlugin().initialize(
-    settings: InitializationSettings(
-      android: const AndroidInitializationSettings('logo_black'),
+    settings: const InitializationSettings(
+      android: AndroidInitializationSettings('logo_black'),
       iOS: DarwinInitializationSettings(
         requestBadgePermission: false,
-        notificationCategories: <DarwinNotificationCategory>[
-          ChallengeNotification.darwinPlayableVariantCategory(l10n),
-          ChallengeNotification.darwinUnplayableVariantCategory(l10n),
-          AnnounceNotification.darwinCategory(l10n),
-        ],
       ),
-      linux: const LinuxInitializationSettings(defaultActionName: 'Action'),
+      linux: LinuxInitializationSettings(defaultActionName: 'Action'),
     ),
     onDidReceiveNotificationResponse: NotificationService.onDidReceiveNotificationResponse,
     // onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
   );
-}
-
-Future<void> preloadPieceImages() async {
-  final prefs = LichessBinding.instance.sharedPreferences;
-  final storedPrefs = prefs.getString(PrefCategory.board.storageKey);
-  BoardPrefs boardPrefs = BoardPrefs.defaults;
-  if (storedPrefs != null) {
-    try {
-      boardPrefs = BoardPrefs.fromJson(jsonDecode(storedPrefs) as Map<String, dynamic>);
-    } catch (e) {
-      _logger.warning('Failed to decode board preferences: $e');
-    }
-  }
-
-  await precachePieceImages(boardPrefs.pieceSet);
 }
 
 /// Display setup on Android.

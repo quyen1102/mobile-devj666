@@ -5,36 +5,30 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:lichess_mobile/l10n/l10n.dart';
-import 'package:lichess_mobile/src/constants.dart';
-import 'package:lichess_mobile/src/utils/l10n_context.dart';
-import 'package:lichess_mobile/src/view/home/home_tab_screen.dart';
-import 'package:lichess_mobile/src/view/learn/learn_tab_screen.dart';
-import 'package:lichess_mobile/src/view/more/more_tab_screen.dart';
-import 'package:lichess_mobile/src/view/puzzle/puzzle_tab_screen.dart';
-import 'package:lichess_mobile/src/view/watch/watch_tab_screen.dart';
-import 'package:lichess_mobile/src/widgets/background.dart';
+import 'package:nf_base/l10n/l10n.dart';
+import 'package:nf_base/src/constants.dart';
+import 'package:nf_base/src/utils/l10n_context.dart';
+import 'package:nf_base/src/view/home/home_tab_screen.dart';
+import 'package:nf_base/src/view/settings/settings_screen.dart';
+import 'package:nf_base/src/widgets/background.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 enum BottomTab {
   home,
-  puzzles,
-  learn,
-  watch,
-  more;
+  notifications,
+  settings,
+  account;
 
   String label(AppLocalizations strings) {
     switch (this) {
       case BottomTab.home:
-        return strings.mobileHomeTab;
-      case BottomTab.puzzles:
-        return strings.mobilePuzzlesTab;
-      case BottomTab.learn:
-        return strings.learnMenu;
-      case BottomTab.watch:
-        return strings.mobileWatchTab;
-      case BottomTab.more:
-        return strings.more;
+        return 'Home';
+      case BottomTab.notifications:
+        return 'Notifications';
+      case BottomTab.settings:
+        return 'Settings';
+      case BottomTab.account:
+        return 'Account';
     }
   }
 
@@ -42,14 +36,12 @@ enum BottomTab {
     switch (this) {
       case BottomTab.home:
         return Symbols.home_rounded;
-      case BottomTab.puzzles:
-        return Symbols.extension_rounded;
-      case BottomTab.watch:
-        return Symbols.live_tv_rounded;
-      case BottomTab.learn:
-        return Symbols.school_rounded;
-      case BottomTab.more:
-        return Symbols.menu_rounded;
+      case BottomTab.notifications:
+        return Symbols.notifications_rounded;
+      case BottomTab.settings:
+        return Symbols.settings_rounded;
+      case BottomTab.account:
+        return Symbols.person_rounded;
     }
   }
 }
@@ -61,14 +53,12 @@ final currentNavigatorKeyProvider = Provider<GlobalKey<NavigatorState>>((ref) {
   switch (currentTab) {
     case BottomTab.home:
       return homeNavigatorKey;
-    case BottomTab.puzzles:
-      return puzzlesNavigatorKey;
-    case BottomTab.watch:
-      return watchNavigatorKey;
-    case BottomTab.learn:
-      return learnNavigatorKey;
-    case BottomTab.more:
-      return moreNavigatorKey;
+    case BottomTab.notifications:
+      return notificationsNavigatorKey;
+    case BottomTab.settings:
+      return settingsNavigatorKey;
+    case BottomTab.account:
+      return accountNavigatorKey;
   }
 });
 
@@ -77,50 +67,31 @@ final currentRootScrollControllerProvider = Provider<ScrollController>((ref) {
   switch (currentTab) {
     case BottomTab.home:
       return homeScrollController;
-    case BottomTab.puzzles:
-      return puzzlesScrollController;
-    case BottomTab.learn:
-      return learnScrollController;
-    case BottomTab.watch:
-      return watchScrollController;
-    case BottomTab.more:
-      return moreScrollController;
+    case BottomTab.notifications:
+      return notificationsScrollController;
+    case BottomTab.settings:
+      return settingsScrollController;
+    case BottomTab.account:
+      return accountScrollController;
   }
 });
 
 final homeNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'home');
-final puzzlesNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'puzzles');
-final learnNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'learn');
-final watchNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'watch');
-final moreNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'more');
+final notificationsNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'notifications');
+final settingsNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'settings');
+final accountNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'account');
 
 final homeScrollController = ScrollController(debugLabel: 'HomeScroll');
-final puzzlesScrollController = ScrollController(debugLabel: 'PuzzlesScroll');
-final learnScrollController = ScrollController(debugLabel: 'learnScroll');
-final watchScrollController = ScrollController(debugLabel: 'WatchScroll');
-final moreScrollController = ScrollController(debugLabel: 'MoreScroll');
+final notificationsScrollController = ScrollController(debugLabel: 'NotificationsScroll');
+final settingsScrollController = ScrollController(debugLabel: 'SettingsScroll');
+final accountScrollController = ScrollController(debugLabel: 'AccountScroll');
 
 final RouteObserver<PageRoute<void>> rootNavPageRouteObserver = RouteObserver<PageRoute<void>>();
 
-/// A [ChangeNotifier] that can be used to notify when the Home tab is tapped, and all the built in
-/// interactions (pop stack, scroll to top) are done.
 final homeTabInteraction = _BottomTabInteraction();
-
-/// A [ChangeNotifier] that can be used to notify when the Puzzles tab is tapped, and all the built in
-/// interactions (pop stack, scroll to top) are done.
-final puzzlesTabInteraction = _BottomTabInteraction();
-
-/// A [ChangeNotifier] that can be used to notify when the learn tab is tapped, and all the built interactions
-/// (pop stack, scroll to top) are done.
-final learnTabInteraction = _BottomTabInteraction();
-
-/// A [ChangeNotifier] that can be used to notify when the Watch tab is tapped, and all the built in
-/// interactions (pop stack, scroll to top) are done.
-final watchTabInteraction = _BottomTabInteraction();
-
-/// A [ChangeNotifier] that can be used to notify when the More tab is tapped, and all the built in
-/// interactions (pop stack, scroll to top) are done.
-final moreTabInteraction = _BottomTabInteraction();
+final notificationsTabInteraction = _BottomTabInteraction();
+final settingsTabInteraction = _BottomTabInteraction();
+final accountTabInteraction = _BottomTabInteraction();
 
 class _BottomTabInteraction extends ChangeNotifier {
   void notifyItemTapped() {
@@ -128,14 +99,12 @@ class _BottomTabInteraction extends ChangeNotifier {
   }
 }
 
-/// Main scaffold that provides the bottom navigation bar and tab switching view.
 class MainTabScaffold extends ConsumerWidget {
   const MainTabScaffold({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentTab = ref.watch(currentBottomTabProvider);
-
     final extendBody = Theme.of(context).platform == TargetPlatform.iOS;
 
     return FullScreenBackground(
@@ -176,11 +145,6 @@ class MainTabScaffold extends ConsumerWidget {
     );
   }
 
-  /// If tapped tab is the same as the current tab, pop to the first route in
-  /// the tab's stack.
-  /// If the route is already at the first route, scroll the tab's root
-  /// scrollable to the top.
-  /// Otherwise, switch to the tapped tab.
   void _onItemTapped(WidgetRef ref, int index) {
     final curTab = ref.read(currentBottomTabProvider);
     final tappedTab = BottomTab.values[index];
@@ -200,14 +164,12 @@ class MainTabScaffold extends ConsumerWidget {
         switch (tappedTab) {
           case BottomTab.home:
             homeTabInteraction.notifyItemTapped();
-          case BottomTab.puzzles:
-            puzzlesTabInteraction.notifyItemTapped();
-          case BottomTab.learn:
-            learnTabInteraction.notifyItemTapped();
-          case BottomTab.watch:
-            watchTabInteraction.notifyItemTapped();
-          case BottomTab.more:
-            moreTabInteraction.notifyItemTapped();
+          case BottomTab.notifications:
+            notificationsTabInteraction.notifyItemTapped();
+          case BottomTab.settings:
+            settingsTabInteraction.notifyItemTapped();
+          case BottomTab.account:
+            accountTabInteraction.notifyItemTapped();
         }
       }
     } else {
@@ -225,27 +187,21 @@ class MainTabScaffold extends ConsumerWidget {
         );
       case 1:
         return _MaterialTabView(
-          navigatorKey: puzzlesNavigatorKey,
-          tab: BottomTab.puzzles,
-          builder: (context) => const PuzzleTabScreen(),
+          navigatorKey: notificationsNavigatorKey,
+          tab: BottomTab.notifications,
+          builder: (context) => const _NotificationsPlaceholderScreen(),
         );
       case 2:
         return _MaterialTabView(
-          navigatorKey: learnNavigatorKey,
-          tab: BottomTab.learn,
-          builder: (context) => const LearnTabScreen(),
+          navigatorKey: settingsNavigatorKey,
+          tab: BottomTab.settings,
+          builder: (context) => const SettingsScreen(),
         );
       case 3:
         return _MaterialTabView(
-          navigatorKey: watchNavigatorKey,
-          tab: BottomTab.watch,
-          builder: (context) => const WatchTabScreen(),
-        );
-      case 4:
-        return _MaterialTabView(
-          navigatorKey: moreNavigatorKey,
-          tab: BottomTab.more,
-          builder: (context) => const MoreTabScreen(),
+          navigatorKey: accountNavigatorKey,
+          tab: BottomTab.account,
+          builder: (context) => const _AccountPlaceholderScreen(),
         );
       default:
         assert(false, 'Unexpected tab');
@@ -254,12 +210,49 @@ class MainTabScaffold extends ConsumerWidget {
   }
 }
 
-/// [InheritedWidget] providing [Scaffold] properties of the [MainTabScaffold].
+class _NotificationsPlaceholderScreen extends StatelessWidget {
+  const _NotificationsPlaceholderScreen();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Notifications')),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Symbols.notifications, size: 64),
+            SizedBox(height: 16),
+            Text('No notifications yet.'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AccountPlaceholderScreen extends StatelessWidget {
+  const _AccountPlaceholderScreen();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Account')),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Symbols.person, size: 64),
+            SizedBox(height: 16),
+            Text('Guest User'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class MainTabScaffoldProperties extends InheritedWidget {
-  /// Constructs a new [MainTabScaffoldProperties].
   const MainTabScaffoldProperties({required super.child, required this.extendBody, super.key});
 
-  /// The value of [Scaffold.extendBody] defined in the [MainTabScaffold].
   final bool extendBody;
 
   @override
@@ -267,12 +260,10 @@ class MainTabScaffoldProperties extends InheritedWidget {
     return extendBody != oldWidget.extendBody;
   }
 
-  /// Retrieve the [MainTabScaffoldProperties] background color from the context.
   static MainTabScaffoldProperties? maybeOf(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<MainTabScaffoldProperties>();
   }
 
-  /// Returns true if the [MainTabScaffold] has an extended body.
   static bool hasExtendedBody(BuildContext context) {
     final properties = maybeOf(context);
     return properties != null && properties.extendBody;
@@ -285,30 +276,21 @@ class MainTabScaffoldProperties extends InheritedWidget {
   }
 }
 
-// --
-
-// Below code taken and adapted from https://github.com/flutter/flutter/blob/135454af32477f815a7525073027a3ff9eff1bfd/packages/flutter/lib/src/cupertino/tab_scaffold.dart#L403
-
-/// A widget laying out multiple tabs with only one active tab being built
-/// at a time and on stage. Off stage tabs' animations are stopped.
 class _TabSwitchingView extends StatefulWidget {
   const _TabSwitchingView({required this.currentTab, required this.tabBuilder});
 
   final BottomTab currentTab;
-  final IndexedWidgetBuilder tabBuilder;
+  final WidgetBuilder2 tabBuilder;
 
   @override
   _TabSwitchingViewState createState() => _TabSwitchingViewState();
 }
 
+typedef WidgetBuilder2 = Widget Function(BuildContext context, int index);
+
 class _TabSwitchingViewState extends State<_TabSwitchingView> {
   final List<bool> shouldBuildTab = <bool>[];
   final List<FocusScopeNode> tabFocusNodes = <FocusScopeNode>[];
-
-  // When focus nodes are no longer needed, we need to dispose of them, but we
-  // can't be sure that nothing else is listening to them until this widget is
-  // disposed of, so when they are no longer needed, we move them to this list,
-  // and dispose of them when we dispose of this widget.
   final List<FocusScopeNode> discardedNodes = <FocusScopeNode>[];
 
   @override
@@ -329,8 +311,6 @@ class _TabSwitchingViewState extends State<_TabSwitchingView> {
     _focusActiveTab();
   }
 
-  // Will focus the active tab if the FocusScope above it has focus already.  If
-  // not, then it will just mark it as the preferred focus for that scope.
   void _focusActiveTab() {
     if (tabFocusNodes.length != BottomTab.values.length) {
       if (tabFocusNodes.length > BottomTab.values.length) {
@@ -390,42 +370,20 @@ class _TabSwitchingViewState extends State<_TabSwitchingView> {
   }
 }
 
-// Following code copied and adapted from
-// https://github.com/flutter/flutter/blob/2ad6cd72c040113b47ee9055e722606a490ef0da/packages/flutter/lib/src/cupertino/tab_view.dart#L41
-
 class _MaterialTabView extends ConsumerStatefulWidget {
   const _MaterialTabView({
-    // ignore: unused_element_parameter
     super.key,
     required this.tab,
     this.builder,
     this.navigatorKey,
-    // ignore: unused_element_parameter
-    this.routes,
-    // ignore: unused_element_parameter
-    this.onGenerateRoute,
-    // ignore: unused_element_parameter
-    this.onUnknownRoute,
-    // ignore: unused_element_parameter
     this.navigatorObservers = const <NavigatorObserver>[],
-    // ignore: unused_element_parameter
     this.restorationScopeId,
   });
 
   final BottomTab tab;
-
   final WidgetBuilder? builder;
-
   final GlobalKey<NavigatorState>? navigatorKey;
-
-  final Map<String, WidgetBuilder>? routes;
-
-  final RouteFactory? onGenerateRoute;
-
-  final RouteFactory? onUnknownRoute;
-
   final List<NavigatorObserver> navigatorObservers;
-
   final String? restorationScopeId;
 
   @override
@@ -433,10 +391,7 @@ class _MaterialTabView extends ConsumerStatefulWidget {
 }
 
 class _MaterialTabViewState extends ConsumerState<_MaterialTabView> {
-  // ignore: avoid-late-keyword
   late HeroController _heroController;
-
-  // ignore: avoid-late-keyword
   late List<NavigatorObserver> _navigatorObservers;
 
   @override
@@ -474,7 +429,6 @@ class _MaterialTabViewState extends ConsumerState<_MaterialTabView> {
       child: Navigator(
         key: widget.navigatorKey,
         onGenerateRoute: _onGenerateRoute,
-        onUnknownRoute: _onUnknownRoute,
         observers: _navigatorObservers,
         restorationScopeId: widget.restorationScopeId,
       ),
@@ -486,178 +440,52 @@ class _MaterialTabViewState extends ConsumerState<_MaterialTabView> {
     WidgetBuilder? routeBuilder;
     if (name == Navigator.defaultRouteName && widget.builder != null) {
       routeBuilder = widget.builder;
-    } else if (widget.routes != null) {
-      routeBuilder = widget.routes![name];
     }
     if (routeBuilder != null) {
       return MaterialPageRoute<dynamic>(builder: routeBuilder, settings: settings);
     }
-    if (widget.onGenerateRoute != null) {
-      return widget.onGenerateRoute!(settings);
-    }
     return null;
-  }
-
-  Route<dynamic>? _onUnknownRoute(RouteSettings settings) {
-    assert(() {
-      if (widget.onUnknownRoute == null) {
-        throw FlutterError(
-          'Could not find a generator for route $settings in the $runtimeType.\n'
-          'Generators for routes are searched for in the following order:\n'
-          ' 1. For the "/" route, the "builder" property, if non-null, is used.\n'
-          ' 2. Otherwise, the "routes" table is used, if it has an entry for '
-          'the route.\n'
-          ' 3. Otherwise, onGenerateRoute is called. It should return a '
-          'non-null value for any valid route not handled by "builder" and "routes".\n'
-          ' 4. Finally if all else fails onUnknownRoute is called.\n'
-          'Unfortunately, onUnknownRoute was not set.',
-        );
-      }
-      return true;
-    }());
-    final Route<dynamic>? result = widget.onUnknownRoute!(settings);
-    assert(() {
-      if (result == null) {
-        throw FlutterError(
-          'The onUnknownRoute callback returned null.\n'
-          'When the $runtimeType requested the route $settings from its '
-          'onUnknownRoute callback, the callback returned null. Such callbacks '
-          'must never return null.',
-        );
-      }
-      return true;
-    }());
-    return result;
   }
 }
 
-// Code taken and adapted from
-// https://github.com/flutter/flutter/blob/main/packages/flutter/lib/src/cupertino/bottom_tab_bar.dart#L60
-
-// Standard iOS 10 tab bar height.
 const double _kTabBarHeight = 50.0;
-
 const Color _kDefaultTabBarBorderColor = CupertinoDynamicColor.withBrightness(
   color: Color(0x4D000000),
   darkColor: Color(0x29000000),
 );
 const Color _kDefaultTabBarInactiveColor = CupertinoColors.inactiveGray;
 
-/// An iOS-styled bottom navigation tab bar.
-///
-/// Displays multiple tabs using [BottomNavigationBarItem] with one tab being
-/// active, the first tab by default.
-///
-/// This [StatelessWidget] doesn't store the active tab itself. You must
-/// listen to the [onTap] callbacks and call `setState` with a new [currentIndex]
-/// for the new selection to reflect. This can also be done automatically
-/// by wrapping this with a [CupertinoTabScaffold].
-///
-/// Tab changes typically trigger a switch between [Navigator]s, each with its
-/// own navigation stack, per standard iOS design. This can be done by using
-/// [CupertinoTabView]s inside each tab builder in [CupertinoTabScaffold].
-///
-/// If the given [backgroundColor]'s opacity is not 1.0 (which is the case by
-/// default), it will produce a blurring effect to the content behind it.
-///
-/// When used as [CupertinoTabScaffold.tabBar], by default [CupertinoTabBar]
-/// disables text scaling to match the native iOS behavior. To override
-/// this behavior, wrap each of the `navigationBar`'s components inside a
-/// [MediaQuery] with the desired [TextScaler].
-///
-/// {@tool dartpad}
-/// This example shows a [CupertinoTabBar] placed in a [CupertinoTabScaffold].
-///
-/// ** See code in examples/api/lib/cupertino/bottom_tab_bar/cupertino_tab_bar.0.dart **
-/// {@end-tool}
-///
-/// See also:
-///
-///  * [CupertinoTabScaffold], which hosts the [CupertinoTabBar] at the bottom.
-///  * [BottomNavigationBarItem], an item in a [CupertinoTabBar].
-///  * <https://developer.apple.com/design/human-interface-guidelines/ios/bars/tab-bars/>
 class _CupertinoTabBar extends StatelessWidget implements PreferredSizeWidget {
-  /// Creates a tab bar in the iOS style.
   const _CupertinoTabBar({
-    // ignore: unused_element_parameter
-    super.key,
     required this.items,
     this.onTap,
     this.currentIndex = 0,
     this.backgroundColor,
     this.activeColor,
-    // ignore: unused_element_parameter
     this.inactiveColor = _kDefaultTabBarInactiveColor,
-    // ignore: unused_element_parameter
     this.iconSize = 30.0,
     this.height = _kTabBarHeight,
     this.border = const Border(
       top: BorderSide(
         color: _kDefaultTabBarBorderColor,
-        width: 0.0, // 0.0 means one physical pixel
+        width: 0.0,
       ),
     ),
-  }) : assert(items.length >= 2, "Tabs need at least 2 items to conform to Apple's HIG"),
-       assert(0 <= currentIndex && currentIndex < items.length),
-       assert(height >= 0.0);
+  });
 
-  /// The interactive items laid out within the bottom navigation bar.
   final List<BottomNavigationBarItem> items;
-
-  /// The callback that is called when a item is tapped.
-  ///
-  /// The widget creating the bottom navigation bar needs to keep track of the
-  /// current index and call `setState` to rebuild it with the newly provided
-  /// index.
   final ValueChanged<int>? onTap;
-
-  /// The index into [items] of the current active item.
-  ///
-  /// Must be between 0 and the number of tabs minus 1, inclusive.
   final int currentIndex;
-
-  /// The background color of the tab bar. If it contains transparency, the
-  /// tab bar will automatically produce a blurring effect to the content
-  /// behind it.
-  ///
-  /// Defaults to [CupertinoTheme]'s `barBackgroundColor` when null.
   final Color? backgroundColor;
-
-  /// The foreground color of the icon and title for the [BottomNavigationBarItem]
-  /// of the selected tab.
-  ///
-  /// Defaults to [CupertinoTheme]'s `primaryColor` if null.
   final Color? activeColor;
-
-  /// The foreground color of the icon and title for the [BottomNavigationBarItem]s
-  /// in the unselected state.
-  ///
-  /// Defaults to a [CupertinoDynamicColor] that matches the disabled foreground
-  /// color of the native `UITabBar` component.
   final Color inactiveColor;
-
-  /// The size of all of the [BottomNavigationBarItem] icons.
-  ///
-  /// This value is used to configure the [IconTheme] for the navigation bar.
-  /// When a [BottomNavigationBarItem.icon] widget is not an [Icon] the widget
-  /// should configure itself to match the icon theme's size and color.
   final double iconSize;
-
-  /// The height of the [CupertinoTabBar].
-  ///
-  /// Defaults to 50.
   final double height;
-
-  /// The border of the [CupertinoTabBar].
-  ///
-  /// The default value is a one physical pixel top border with grey color.
   final Border? border;
 
   @override
   Size get preferredSize => Size.fromHeight(height);
 
-  /// Indicates whether the tab bar is fully opaque or can have contents behind
-  /// it show through it.
   bool opaque(BuildContext context) {
     final Color backgroundColor =
         this.backgroundColor ?? CupertinoTheme.of(context).barBackgroundColor;
@@ -680,7 +508,6 @@ class _CupertinoTabBar extends StatelessWidget implements PreferredSizeWidget {
           : side.copyWith(color: CupertinoDynamicColor.resolve(side.color, context));
     }
 
-    // Return the border as is when it's a subclass.
     final Border? resolvedBorder = border == null || border.runtimeType != Border
         ? border
         : Border(
@@ -696,17 +523,14 @@ class _CupertinoTabBar extends StatelessWidget implements PreferredSizeWidget {
       child: SizedBox(
         height: height + bottomPadding,
         child: IconTheme.merge(
-          // Default with the inactive state.
           data: IconThemeData(color: inactive, size: iconSize),
           child: DefaultTextStyle(
-            // Default with the inactive state.
             style: CupertinoTheme.of(context).textTheme.tabLabelTextStyle.copyWith(color: inactive),
             child: Padding(
               padding: EdgeInsets.only(bottom: bottomPadding),
               child: Semantics(
                 explicitChildNodes: true,
                 child: Row(
-                  // Align bottom since we want the labels to be aligned.
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: _buildTabItems(context),
                 ),
@@ -718,7 +542,6 @@ class _CupertinoTabBar extends StatelessWidget implements PreferredSizeWidget {
     );
 
     if (!opaque(context)) {
-      // For non-opaque backgrounds, apply a blur effect.
       result = ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: kCupertinoBarBlurSigma, sigmaY: kCupertinoBarBlurSigma),
@@ -740,8 +563,6 @@ class _CupertinoTabBar extends StatelessWidget implements PreferredSizeWidget {
         _wrapActiveItem(
           context,
           Expanded(
-            // Make tab items part of the EditableText tap region so that
-            // switching tabs doesn't unfocus text fields.
             child: TextFieldTapRegion(
               child: Semantics(
                 selected: active,
@@ -782,7 +603,6 @@ class _CupertinoTabBar extends StatelessWidget implements PreferredSizeWidget {
     ];
   }
 
-  /// Change the active tab item's icon and title colors to active.
   Widget _wrapActiveItem(BuildContext context, Widget item, {required bool active}) {
     if (!active) {
       return item;
@@ -798,34 +618,6 @@ class _CupertinoTabBar extends StatelessWidget implements PreferredSizeWidget {
         style: TextStyle(color: activeColor),
         child: item,
       ),
-    );
-  }
-
-  /// Create a clone of the current [CupertinoTabBar] but with provided
-  /// parameters overridden.
-  CupertinoTabBar copyWith({
-    Key? key,
-    List<BottomNavigationBarItem>? items,
-    Color? backgroundColor,
-    Color? activeColor,
-    Color? inactiveColor,
-    double? iconSize,
-    double? height,
-    Border? border,
-    int? currentIndex,
-    ValueChanged<int>? onTap,
-  }) {
-    return CupertinoTabBar(
-      key: key ?? this.key,
-      items: items ?? this.items,
-      backgroundColor: backgroundColor ?? this.backgroundColor,
-      activeColor: activeColor ?? this.activeColor,
-      inactiveColor: inactiveColor ?? this.inactiveColor,
-      iconSize: iconSize ?? this.iconSize,
-      height: height ?? this.height,
-      border: border ?? this.border,
-      currentIndex: currentIndex ?? this.currentIndex,
-      onTap: onTap ?? this.onTap,
     );
   }
 }

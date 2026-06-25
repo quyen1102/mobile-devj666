@@ -5,15 +5,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lichess_mobile/l10n/l10n.dart';
-import 'package:lichess_mobile/src/binding.dart';
-import 'package:lichess_mobile/src/localizations.dart';
-import 'package:lichess_mobile/src/model/auth/auth_controller.dart';
-import 'package:lichess_mobile/src/model/common/preloaded_data.dart';
-import 'package:lichess_mobile/src/model/notifications/notifications.dart';
-import 'package:lichess_mobile/src/network/connectivity.dart';
-import 'package:lichess_mobile/src/network/http.dart';
-import 'package:lichess_mobile/src/utils/badge_service.dart';
+import 'package:nf_base/l10n/l10n.dart';
+import 'package:nf_base/src/binding.dart';
+import 'package:nf_base/src/localizations.dart';
+import 'package:nf_base/src/model/auth/auth_controller.dart';
+import 'package:nf_base/src/model/common/preloaded_data.dart';
+import 'package:nf_base/src/model/notifications/notifications.dart';
+import 'package:nf_base/src/network/connectivity.dart';
+import 'package:nf_base/src/utils/badge_service.dart';
 import 'package:logging/logging.dart';
 
 final _logger = Logger('NotificationService');
@@ -204,39 +203,6 @@ class NotificationService {
     final parsedMessage = FcmMessage.fromRemoteMessage(message);
 
     switch (parsedMessage) {
-      case final ChallengeCreateFcmMessage challengeCreateMessage:
-        final notification = ChallengeCreatedNotification.fromFcmMessage(challengeCreateMessage);
-        _responseStreamController.add((
-          NotificationResponse(
-            notificationResponseType: NotificationResponseType.selectedNotification,
-            id: notification.id,
-            payload: jsonEncode(notification.payload),
-          ),
-          notification,
-        ));
-
-      case final ChallengeAcceptFcmMessage challengeAcceptMessage:
-        final notification = ChallengeAcceptedNotification.fromFcmMessage(challengeAcceptMessage);
-        _responseStreamController.add((
-          NotificationResponse(
-            notificationResponseType: NotificationResponseType.selectedNotification,
-            id: notification.id,
-            payload: jsonEncode(notification.payload),
-          ),
-          notification,
-        ));
-
-      case final CorresGameUpdateFcmMessage corresMessage:
-        final notification = CorresGameUpdateNotification.fromFcmMessage(corresMessage);
-        _responseStreamController.add((
-          NotificationResponse(
-            notificationResponseType: NotificationResponseType.selectedNotification,
-            id: notification.id,
-            payload: jsonEncode(notification.payload),
-          ),
-          notification,
-        ));
-
       case final NewMessageFcmMessage newMessage:
         final notification = NewMessageNotification.fromFcmMessage(newMessage);
         _responseStreamController.add((
@@ -248,9 +214,8 @@ class NotificationService {
           notification,
         ));
 
-      // TODO: handle other notification types
       case UnhandledFcmMessage(data: final data):
-        _logger.warning('Received unhandled FCM notification type: ${data['lichess.type']}');
+        _logger.warning('Received unhandled FCM notification type: ${data['app.type']}');
 
       case MalformedFcmMessage(data: final data):
         _logger.severe('Received malformed FCM message: $data');
@@ -258,18 +223,6 @@ class NotificationService {
   }
 
   /// Process a message received from the Firebase Cloud Messaging service.
-  ///
-  /// If the message contains a [RemoteMessage.notification] field and if it is
-  /// received while the app was in foreground, the notification is by default not
-  /// shown to the user.
-  /// Depending on the message type, we may as well show a local notification.
-  ///
-  /// Some messages (whether or not they have an associated notification), have
-  /// a [RemoteMessage.data] field used to update the application state according
-  /// to the message type.
-  ///
-  /// A special data field, 'lichess.iosBadge', is used to update the iOS app's
-  /// badge count according to the value held by the server.
   Future<void> _processFcmMessage(
     RemoteMessage message, {
 
@@ -285,36 +238,20 @@ class NotificationService {
     _fcmMessageStreamController.add((message: parsedMessage, fromBackground: fromBackground));
 
     switch (parsedMessage) {
-      case CorresGameUpdateFcmMessage(fullId: final fullId, notification: final notification):
-        if (fromBackground == false && notification != null) {
-          await show(CorresGameUpdateNotification(fullId, notification.title!, notification.body!));
-        }
-
       case NewMessageFcmMessage(conversationId: final userId, notification: final notification):
         if (fromBackground == false && notification != null) {
           await show(NewMessageNotification(userId, notification.title!, notification.body!));
         }
 
-      case ChallengeCreateFcmMessage():
-        // nothing to do here in foreground as it should be handled by the socket
-        break;
-
-      case ChallengeAcceptFcmMessage(fullId: final fullId, notification: final notification):
-        if (fromBackground == false && notification != null) {
-          await show(
-            ChallengeAcceptedNotification(fullId, notification.title!, notification.body!),
-          );
-        }
-
       case UnhandledFcmMessage(data: final data):
-        _logger.warning('Received unhandled FCM notification type: ${data['lichess.type']}');
+        _logger.warning('Received unhandled FCM notification type: ${data['app.type']}');
 
       case MalformedFcmMessage(data: final data):
         _logger.severe('Received malformed FCM message: $data');
     }
 
-    // update badge
-    final badge = message.data['lichess.iosBadge'] as String?;
+    // update badge count from custom data if available
+    final badge = message.data['app.iosBadge'] as String?;
     if (badge != null) {
       try {
         await BadgeService.instance.setBadge(int.parse(badge));
@@ -346,16 +283,8 @@ class NotificationService {
 
   /// Unregister the device from push notifications.
   Future<void> unregister() async {
-    _logger.info('will unregister');
-    final authUser = _ref.read(authControllerProvider);
-    if (authUser == null) {
-      return;
-    }
-    try {
-      await _ref.withClient((client) => client.post(Uri(path: '/mobile/unregister')));
-    } catch (e, st) {
-      _logger.severe('could not unregister device; $e', e, st);
-    }
+    _logger.info('Will unregister FCM token');
+    // Implement server unregistration here if applicable.
   }
 
   Future<bool> _registerToken(String token) async {
@@ -363,18 +292,9 @@ class NotificationService {
     if (settings.authorizationStatus == AuthorizationStatus.denied) {
       return false;
     }
-    _logger.info('will register fcmToken: $token');
-    final authUser = _ref.read(authControllerProvider);
-    if (authUser == null) {
-      return false;
-    }
-    try {
-      await _ref.withClient((client) => client.post(Uri(path: '/mobile/register/firebase/$token')));
-      return true;
-    } catch (e, st) {
-      _logger.severe('could not register device; $e', e, st);
-      return false;
-    }
+    _logger.info('Will register fcmToken: $token');
+    // Implement server registration here if applicable.
+    return true;
   }
 
   @pragma('vm:entry-point')

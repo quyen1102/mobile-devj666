@@ -4,8 +4,8 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lichess_mobile/src/utils/focus_detector.dart';
-import 'package:lichess_mobile/src/utils/screen.dart';
+import 'package:nf_base/src/utils/focus_detector.dart';
+import 'package:nf_base/src/utils/screen.dart';
 
 final _deviceInfoPlugin = DeviceInfoPlugin();
 

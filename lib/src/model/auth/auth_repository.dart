@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lichess_mobile/src/constants.dart';
-import 'package:lichess_mobile/src/model/auth/auth_controller.dart';
-import 'package:lichess_mobile/src/model/auth/bearer.dart';
-import 'package:lichess_mobile/src/model/auth/sign_in_failure_reporter.dart';
-import 'package:lichess_mobile/src/model/user/user.dart';
-import 'package:lichess_mobile/src/network/http.dart';
+import 'package:nf_base/src/constants.dart';
+import 'package:nf_base/src/model/auth/auth_controller.dart';
+import 'package:nf_base/src/model/auth/bearer.dart';
+import 'package:nf_base/src/model/auth/sign_in_failure_reporter.dart';
+import 'package:nf_base/src/model/user/user.dart';
+import 'package:nf_base/src/network/http.dart';
 import 'package:logging/logging.dart';
 
 /// Host of the custom URI scheme callback. Must stay in sync with the

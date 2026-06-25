@@ -4,9 +4,9 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lichess_mobile/src/binding.dart';
-import 'package:lichess_mobile/src/model/common/preloaded_data.dart';
-import 'package:lichess_mobile/src/utils/system.dart';
+import 'package:nf_base/src/binding.dart';
+import 'package:nf_base/src/model/common/preloaded_data.dart';
+import 'package:nf_base/src/utils/system.dart';
 
 /// Records a sign-in failure as a non-fatal error in Crashlytics, enriched with the browser, OS and
 /// device that produced it, so failure-prone OS/browser combos can be identified from the reports.

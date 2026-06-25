@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:lichess_mobile/src/constants.dart';
-import 'package:lichess_mobile/src/model/log/http_log_paginator.dart';
-import 'package:lichess_mobile/src/model/log/http_log_storage.dart';
-import 'package:lichess_mobile/src/styles/styles.dart';
-import 'package:lichess_mobile/src/utils/navigation.dart';
-import 'package:lichess_mobile/src/widgets/adaptive_action_sheet.dart';
-import 'package:lichess_mobile/src/widgets/haptic_refresh_indicator.dart';
-import 'package:lichess_mobile/src/widgets/platform_search_bar.dart';
+import 'package:nf_base/src/constants.dart';
+import 'package:nf_base/src/model/log/http_log_paginator.dart';
+import 'package:nf_base/src/model/log/http_log_storage.dart';
+import 'package:nf_base/src/styles/styles.dart';
+import 'package:nf_base/src/utils/navigation.dart';
+import 'package:nf_base/src/widgets/adaptive_action_sheet.dart';
+import 'package:nf_base/src/widgets/haptic_refresh_indicator.dart';
+import 'package:nf_base/src/widgets/platform_search_bar.dart';
 
 class HttpLogScreen extends ConsumerStatefulWidget {
   const HttpLogScreen({super.key});

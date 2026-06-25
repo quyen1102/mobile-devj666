@@ -2,12 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:lichess_mobile/l10n/l10n.dart';
-import 'package:lichess_mobile/src/model/settings/board_preferences.dart'
-    show BoardPrefs, BoardTheme, boardPreferencesProvider;
-import 'package:lichess_mobile/src/model/settings/preferences_storage.dart';
-import 'package:lichess_mobile/src/theme.dart';
-import 'package:lichess_mobile/src/utils/json.dart';
+import 'package:nf_base/l10n/l10n.dart';
+import 'package:nf_base/src/model/settings/preferences_storage.dart';
+import 'package:nf_base/src/theme.dart';
+import 'package:nf_base/src/utils/json.dart';
 
 part 'general_preferences.freezed.dart';
 part 'general_preferences.g.dart';
@@ -57,14 +55,7 @@ class GeneralPreferencesNotifier extends Notifier<GeneralPrefs>
 
   Future<void> toggleSystemColors() {
     final newState = state.copyWith(systemColors: !state.systemColors);
-    return Future.wait([
-      save(newState),
-      ref
-          .read(boardPreferencesProvider.notifier)
-          .setBoardTheme(
-            newState.systemColors ? BoardTheme.system : BoardPrefs.defaults.boardTheme,
-          ),
-    ]).then((_) => {});
+    return save(newState);
   }
 
   Future<void> setBackground({
