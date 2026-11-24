@@ -12,7 +12,7 @@ final contactsProvider = FutureProvider.autoDispose<Contacts>((ref) {
 
 /// A provider for [MessageRepository].
 final messageRepositoryProvider = Provider<MessageRepository>((ref) {
-  return MessageRepository(ref.watch(lichessClientProvider), ref.watch(aggregatorProvider));
+  return MessageRepository(ref.watch(appHttpClientProvider), ref.watch(aggregatorProvider));
 }, name: 'MessageRepositoryProvider');
 
 /// A provider that gets the unread messages count for the current user.
@@ -33,7 +33,7 @@ final unreadMessagesProvider = FutureProvider.autoDispose<UnreadMessages>((ref) 
 class MessageRepository {
   const MessageRepository(this.client, this.aggregator);
 
-  final LichessClient client;
+  final AppHttpClient client;
   final Aggregator aggregator;
 
   Future<UnreadMessages> unreadMessages() {

@@ -14,7 +14,7 @@ import 'package:nf_base/src/utils/system.dart';
 /// This never throws: telemetry must not interfere with the sign-in flow.
 Future<void> reportSignInFailure(Ref ref, Object error, StackTrace stack) async {
   try {
-    final crashlytics = LichessBinding.instance.firebaseCrashlytics;
+    final crashlytics = BaseAppBinding.instance.firebaseCrashlytics;
 
     // AppAuth's own error classification (type/code/oauth-error). See FlutterAppAuthPlatformErrorDetails.
     final details = switch (error) {

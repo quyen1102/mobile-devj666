@@ -5,7 +5,7 @@ import 'package:nf_base/src/constants.dart';
 import 'package:nf_base/src/db/secure_storage.dart';
 import 'package:nf_base/src/model/auth/auth_controller.dart';
 
-const kAuthStorageKey = '$kLichessHost.userSession';
+const kAuthStorageKey = '$kAppHost.userSession';
 
 /// A provider for [AuthStorage].
 final authStorageProvider = Provider<AuthStorage>((Ref ref) {

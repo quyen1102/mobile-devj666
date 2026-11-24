@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nf_base/src/styles/app_icons.dart';
 import 'package:nf_base/src/styles/styles.dart';
 import 'package:nf_base/src/utils/l10n_context.dart';
 import 'package:nf_base/src/widgets/buttons.dart';
@@ -210,7 +211,7 @@ class ListSectionHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(context.l10n.more, style: TextStyle(color: ColorScheme.of(context).primary)),
-                  Icon(Icons.chevron_right, size: 16, color: ColorScheme.of(context).primary),
+                  Icon(AppIcons.chevronRight, size: 16, color: ColorScheme.of(context).primary),
                 ],
               )
             else if (trailing != null)

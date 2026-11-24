@@ -17,6 +17,7 @@ import 'package:nf_base/src/view/settings/app_log_settings_screen.dart';
 import 'package:nf_base/src/view/settings/http_log_screen.dart';
 import 'package:nf_base/src/view/settings/sound_settings_screen.dart';
 import 'package:nf_base/src/view/settings/theme_settings_screen.dart';
+import 'package:nf_base/src/view/todo/todo_screen.dart';
 import 'package:nf_base/src/widgets/adaptive_action_sheet.dart';
 import 'package:nf_base/src/widgets/adaptive_choice_picker.dart';
 import 'package:nf_base/src/widgets/feedback.dart';
@@ -156,6 +157,16 @@ class SettingsScreen extends ConsumerWidget {
                     : null,
                 onTap: () {
                   Navigator.of(context).push(AppLogSettingsScreen.buildRoute());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.check_box_outlined),
+                title: const Text('Quick Tasks (Sample UI)'),
+                trailing: Theme.of(context).platform == TargetPlatform.iOS
+                    ? const CupertinoListTileChevron()
+                    : null,
+                onTap: () {
+                  Navigator.of(context).push(TodoScreen.buildRoute());
                 },
               ),
             ],

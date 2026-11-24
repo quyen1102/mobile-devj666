@@ -1,36 +1,36 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-const kLichessHost = String.fromEnvironment('LICHESS_HOST', defaultValue: 'lichess.dev');
+const kAppHost = String.fromEnvironment('APP_HOST', defaultValue: 'app.dev');
 
-const kLichessWSHost = String.fromEnvironment(
-  'LICHESS_WS_HOST',
-  defaultValue: 'socket.lichess.dev',
+const kAppWSHost = String.fromEnvironment(
+  'APP_WS_HOST',
+  defaultValue: 'socket.app.dev',
 );
 
-const kLichessWSSecret = String.fromEnvironment(
-  'LICHESS_WS_SECRET',
+const kAppWSSecret = String.fromEnvironment(
+  'APP_WS_SECRET',
   defaultValue: 'somethingElseInProd',
 );
 
-const kLichessCDNHost = String.fromEnvironment(
-  'LICHESS_CDN_HOST',
-  defaultValue: 'https://lichess1.org',
+const kAppCDNHost = String.fromEnvironment(
+  'APP_CDN_HOST',
+  defaultValue: 'https://cdn.app.org',
 );
 
-const kLichessOpeningExplorerHost = String.fromEnvironment(
-  'LICHESS_OPENING_EXPLORER_HOST',
-  defaultValue: 'explorer.lichess.org',
+const kAppOpeningExplorerHost = String.fromEnvironment(
+  'APP_OPENING_EXPLORER_HOST',
+  defaultValue: 'explorer.app.org',
 );
 
-const kLichessTablebaseHost = String.fromEnvironment(
-  'LICHESS_TABLEBASE_HOST',
-  defaultValue: 'tablebase.lichess.org',
+const kAppTablebaseHost = String.fromEnvironment(
+  'APP_TABLEBASE_HOST',
+  defaultValue: 'tablebase.app.org',
 );
 
-const kLichessCustomUriSchemeName = 'org.lichess.mobile';
+const kAppCustomUriSchemeName = 'org.app.mobile';
 
-const kLichessClientId = 'lichess_mobile';
+const kAppClientId = 'app_mobile';
 
 const kSRIStorageKey = 'socket_random_identifier';
 

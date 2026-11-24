@@ -22,7 +22,7 @@ final _logger = Logger('Init');
 
 /// Run initialization tasks only once on first app launch or after an update.
 Future<void> initializeApp() async {
-  final prefs = LichessBinding.instance.sharedPreferences;
+  final prefs = BaseAppBinding.instance.sharedPreferences;
 
   try {
     final pInfo = await PackageInfo.fromPlatform();
@@ -46,7 +46,7 @@ Future<void> initializeApp() async {
     }
   } catch (e, st) {
     _logger.severe('Error during app initialization: $e');
-    LichessBinding.instance.firebaseCrashlytics.recordError(
+    BaseAppBinding.instance.firebaseCrashlytics.recordError(
       e,
       st,
       reason: 'Error during app initialization',

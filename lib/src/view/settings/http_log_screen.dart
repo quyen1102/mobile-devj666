@@ -170,7 +170,7 @@ class HttpLogTile extends StatelessWidget {
 
   final HttpLogEntry httpLog;
 
-  String get endpoint => httpLog.requestUrl.host == kLichessHost
+  String get endpoint => httpLog.requestUrl.host == kAppHost
       ? Uri(path: httpLog.requestUrl.path, query: httpLog.requestUrl.query).toString()
       : httpLog.requestUrl.toString();
 

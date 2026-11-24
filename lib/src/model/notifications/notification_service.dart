@@ -95,18 +95,18 @@ class NotificationService {
   /// and after [LichessBinding.initializeNotifications] has been called.
   Future<void> start() async {
     // Listen for incoming messages while the app is in the foreground.
-    LichessBinding.instance.firebaseMessagingOnMessage.listen((RemoteMessage message) {
+    BaseAppBinding.instance.firebaseMessagingOnMessage.listen((RemoteMessage message) {
       _processFcmMessage(message, fromBackground: false);
     });
 
     // Listen for incoming messages while the app is in the background.
-    LichessBinding.instance.firebaseMessagingOnBackgroundMessage(
+    BaseAppBinding.instance.firebaseMessagingOnBackgroundMessage(
       _firebaseMessagingBackgroundHandler,
     );
 
     // Request permission to receive notifications. Pop-up will appear only
     // once.
-    await LichessBinding.instance.firebaseMessaging.requestPermission(
+    await BaseAppBinding.instance.firebaseMessaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
@@ -117,7 +117,7 @@ class NotificationService {
     );
 
     // Listen for token refresh and update the token on the server accordingly.
-    _fcmTokenRefreshSubscription = LichessBinding.instance.firebaseMessaging.onTokenRefresh.listen((
+    _fcmTokenRefreshSubscription = BaseAppBinding.instance.firebaseMessaging.onTokenRefresh.listen((
       String token,
     ) {
       _registerToken(token);
@@ -139,7 +139,7 @@ class NotificationService {
 
     // Get any messages which caused the application to open from
     // a terminated state.
-    final RemoteMessage? initialMessage = await LichessBinding.instance.firebaseMessaging
+    final RemoteMessage? initialMessage = await BaseAppBinding.instance.firebaseMessaging
         .getInitialMessage();
 
     if (initialMessage != null) {
@@ -147,7 +147,7 @@ class NotificationService {
     }
 
     // Handle any other interaction that caused the app to open when in background.
-    LichessBinding.instance.firebaseMessagingOnMessageOpenedApp.listen(_handleFcmMessageOpenedApp);
+    BaseAppBinding.instance.firebaseMessagingOnMessageOpenedApp.listen(_handleFcmMessageOpenedApp);
   }
 
   /// Shows a notification.
@@ -267,13 +267,13 @@ class NotificationService {
   Future<bool> registerDevice() async {
     // For apple platforms, make sure the APNS token is available before making any FCM plugin API calls
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      final apnsToken = await LichessBinding.instance.firebaseMessaging.getAPNSToken();
+      final apnsToken = await BaseAppBinding.instance.firebaseMessaging.getAPNSToken();
       if (apnsToken == null) {
         _logger.warning('APNS token is null');
         return false;
       }
     }
-    final token = await LichessBinding.instance.firebaseMessaging.getToken();
+    final token = await BaseAppBinding.instance.firebaseMessaging.getToken();
     if (token == null) {
       _logger.warning('FCM token is null');
       return false;
@@ -288,7 +288,7 @@ class NotificationService {
   }
 
   Future<bool> _registerToken(String token) async {
-    final settings = await LichessBinding.instance.firebaseMessaging.getNotificationSettings();
+    final settings = await BaseAppBinding.instance.firebaseMessaging.getNotificationSettings();
     if (settings.authorizationStatus == AuthorizationStatus.denied) {
       return false;
     }
@@ -302,8 +302,8 @@ class NotificationService {
     // create a new provider scope for the background isolate
     final ref = ProviderContainer();
 
-    final lichessBinding = AppLichessBinding.ensureInitialized();
-    await lichessBinding.preloadSharedPreferences();
+    final appBinding = AppBinding.ensureInitialized();
+    await appBinding.preloadSharedPreferences();
     await ref.read(preloadedDataProvider.future);
 
     try {

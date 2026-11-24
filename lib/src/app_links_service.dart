@@ -56,7 +56,7 @@ class AppLinksService {
     _linkSubscription?.cancel();
   }
 
-  static const kLichessLinkifiers = [UrlLinkifier(), EmailLinkifier()];
+  static const kAppLinkifiers = [UrlLinkifier(), EmailLinkifier()];
 
   /// Handles link clicks in Linkify widgets.
   Future<void> onLinkifyOpen(BuildContext context, LinkableElement link) async {

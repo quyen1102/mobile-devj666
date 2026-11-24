@@ -7,7 +7,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-const kLichessDatabaseName = 'lichess_mobile.db';
+const kAppDatabaseName = 'app_mobile.db';
 
 const puzzleTTL = Duration(days: 60);
 const corresGameTTL = Duration(days: 60);
@@ -33,10 +33,10 @@ final databaseProvider = FutureProvider<Database>((Ref ref) async {
 Future<String> get _databasePath async {
   if (Platform.isLinux) {
     final directory = await getApplicationSupportDirectory();
-    return join(directory.path, kLichessDatabaseName);
+    return join(directory.path, kAppDatabaseName);
   }
 
-  return join(await getDatabasesPath(), kLichessDatabaseName);
+  return join(await getDatabasesPath(), kAppDatabaseName);
 }
 
 Future<int?> _getDatabaseVersion(Database db) async {
@@ -52,7 +52,7 @@ Future<int?> _getDatabaseVersion(Database db) async {
 
 /// A provider that returns the size of the database file in bytes.
 final getDbSizeInBytesProvider = FutureProvider<int>((Ref ref) async {
-  final dbPath = join(await getDatabasesPath(), kLichessDatabaseName);
+  final dbPath = join(await getDatabasesPath(), kAppDatabaseName);
   final dbFile = File(dbPath);
 
   return dbFile.length();
@@ -63,7 +63,7 @@ Future<Database> openAppDatabase(DatabaseFactory dbFactory, String path) {
   return dbFactory.openDatabase(
     path,
     options: OpenDatabaseOptions(
-      version: 5,
+      version: 6,
       onConfigure: (db) async {
         final version = await _getDatabaseVersion(db);
         _logger.info('SQLite version: $version');
@@ -93,6 +93,7 @@ Future<Database> openAppDatabase(DatabaseFactory dbFactory, String path) {
         _createGameTableV2(batch);
         _createHttpLogTableV4(batch);
         _createAppLogTableV5(batch);
+        _createTodoTableV6(batch);
         await batch.commit();
       },
       onUpgrade: (db, oldVersion, newVersion) async {
@@ -108,6 +109,9 @@ Future<Database> openAppDatabase(DatabaseFactory dbFactory, String path) {
         }
         if (oldVersion < 5) {
           _createAppLogTableV5(batch);
+        }
+        if (oldVersion < 6) {
+          _createTodoTableV6(batch);
         }
         await batch.commit();
       },
@@ -228,6 +232,19 @@ void _createAppLogTableV5(Batch batch) {
     stackTrace TEXT,
     lastModified TEXT NOT NULL
   )
+    ''');
+}
+
+void _createTodoTableV6(Batch batch) {
+  batch.execute('DROP TABLE IF EXISTS todo');
+  batch.execute('''
+    CREATE TABLE todo(
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      isCompleted INTEGER NOT NULL,
+      priority INTEGER NOT NULL,
+      lastModified TEXT NOT NULL
+    )
     ''');
 }
 

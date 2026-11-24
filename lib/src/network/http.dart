@@ -35,13 +35,13 @@ final _logger = Logger('HttpClient');
 
 const _maxCacheSize = 2 * 1024 * 1024;
 
-/// Creates a Uri pointing to lichess server with the given unencoded path and query parameters.
-Uri lichessUri(String unencodedPath, [Map<String, dynamic>? queryParameters]) =>
-    kLichessHost.startsWith('localhost') ||
-        kLichessHost.startsWith('10.') ||
-        kLichessHost.startsWith('192.168.')
-    ? Uri.http(kLichessHost, unencodedPath, queryParameters)
-    : Uri.https(kLichessHost, unencodedPath, queryParameters);
+/// Creates a Uri pointing to app server with the given unencoded path and query parameters.
+Uri appUri(String unencodedPath, [Map<String, dynamic>? queryParameters]) =>
+    kAppHost.startsWith('localhost') ||
+        kAppHost.startsWith('10.') ||
+        kAppHost.startsWith('192.168.')
+    ? Uri.http(kAppHost, unencodedPath, queryParameters)
+    : Uri.https(kAppHost, unencodedPath, queryParameters);
 
 /// Creates the appropriate http client for the platform.
 ///
@@ -52,7 +52,7 @@ class HttpClientFactory {
   final Client Function(Client client)? wrapper;
 
   Client _createClient() {
-    const userAgent = 'Lichess Mobile';
+    const userAgent = 'Base App';
     try {
       if (Platform.isAndroid) {
         final engine = CronetEngine.build(
@@ -144,11 +144,11 @@ final defaultClientProvider = Provider<DefaultClient>((Ref ref) {
   return client;
 }, name: 'DefaultHttpClientProvider');
 
-/// The http client configured to make requests to the lichess API.
+/// The http client configured to make requests to the API.
 ///
 /// Only one instance of this client is created and kept alive for the whole app.
-final lichessClientProvider = Provider<LichessClient>((Ref ref) {
-  final client = LichessClient(
+final appHttpClientProvider = Provider<AppHttpClient>((Ref ref) {
+  final client = AppHttpClient(
     // Retry just once, after 500ms, on 429 Too Many Requests.
     RetryClient(
       ref.read(httpClientFactoryProvider)(),
@@ -160,7 +160,7 @@ final lichessClientProvider = Provider<LichessClient>((Ref ref) {
   );
   ref.onDispose(() => client.close());
   return client;
-}, name: 'LichessHttpClientProvider');
+}, name: 'AppHttpClientProvider');
 
 Duration _defaultDelay(int retryCount) =>
     const Duration(milliseconds: 900) * math.pow(1.5, retryCount);
@@ -178,7 +178,7 @@ final userAgentProvider = Provider<String>((Ref ref) {
 
 /// Creates a user-agent string with the app version, build number, and device info and possibly the user ID if a user is logged in.
 String makeUserAgent(PackageInfo info, BaseDeviceInfo deviceInfo, String sri, LightUser? user) {
-  final base = 'Lichess Mobile/${info.version} as:${user?.id ?? 'anon'} sri:$sri';
+  final base = 'Base App/${info.version} as:${user?.id ?? 'anon'} sri:$sri';
 
   if (deviceInfo is AndroidDeviceInfo) {
     return '$base os:Android/${deviceInfo.version.release} dev:${deviceInfo.model}';
@@ -318,19 +318,19 @@ class _RegisterCallbackClient extends BaseClient {
   }
 }
 
-/// Lichess HTTP client.
+/// App HTTP client.
 ///
 /// * Requests made with [head], [get], [post], [put], [patch], [delete] that contain
-/// only a path (no host or scheme) are automatically routed to the lichess server
-/// defined in [kLichessHost]. If the URL already contains a host and scheme, it is
+/// only a path (no host or scheme) are automatically routed to the app server
+/// defined in [kAppHost]. If the URL already contains a host and scheme, it is
 /// used as-is. It does not apply to the low-level [send] method.
 /// * Sets the Authorization header when a token has been stored.
 /// * Sets the user-agent header with the app version, build number, and device info. If the user is logged in, it also includes the user's id.
 /// * Logs all requests and responses with status code >= 400.
 /// * When a response has the 401 status, checks if the authUser token is still valid,
 /// and deletes the authUser if it's not.
-class LichessClient implements Client {
-  LichessClient(this._inner, this._ref);
+class AppHttpClient implements Client {
+  AppHttpClient(this._inner, this._ref);
 
   static const defaultRequestTimeout = Duration(seconds: 15);
 
@@ -446,7 +446,7 @@ class LichessClient implements Client {
   ]) async {
     final request = Request(
       method,
-      url.host.isNotEmpty ? url : lichessUri(url.path, url.hasQuery ? url.queryParameters : null),
+      url.host.isNotEmpty ? url : appUri(url.path, url.hasQuery ? url.queryParameters : null),
     );
 
     if (headers != null) request.headers.addAll(headers);
@@ -843,30 +843,30 @@ extension ClientExtension on Client {
 }
 
 extension ClientWidgetRefExtension on WidgetRef {
-  /// Runs [fn] with a [LichessClient].
-  Future<T> withClient<T>(Future<T> Function(LichessClient) fn) async {
-    final client = read(lichessClientProvider);
+  /// Runs [fn] with a [AppHttpClient].
+  Future<T> withClient<T>(Future<T> Function(AppHttpClient) fn) async {
+    final client = read(appHttpClientProvider);
     return await fn(client);
   }
 }
 
 extension ClientRefExtension on Ref {
-  /// Runs [fn] with a [LichessClient].
-  Future<T> withClient<T>(Future<T> Function(LichessClient) fn) async {
-    final client = read(lichessClientProvider);
+  /// Runs [fn] with a [AppHttpClient].
+  Future<T> withClient<T>(Future<T> Function(AppHttpClient) fn) async {
+    final client = read(appHttpClientProvider);
     return await fn(client);
   }
 
-  /// Runs [fn] with a [LichessClient] and keeps the provider alive for [duration].
+  /// Runs [fn] with a [AppHttpClient] and keeps the provider alive for [duration].
   ///
   /// This is primarily used for caching network requests in a [FutureProvider].
   ///
   /// If [fn] throws with a [ServerException], the provider is kept alive as we don't want to retry
   /// server errors immediately.
-  Future<U> withClientCacheFor<U>(Future<U> Function(LichessClient) fn, Duration duration) async {
+  Future<U> withClientCacheFor<U>(Future<U> Function(AppHttpClient) fn, Duration duration) async {
     final link = keepAlive();
     final timer = Timer(duration, link.close);
-    final client = read(lichessClientProvider);
+    final client = read(appHttpClientProvider);
     onDispose(() {
       timer.cancel();
     });
@@ -887,12 +887,12 @@ extension ClientRefExtension on Ref {
   /// If [fn] throws with a [ServerException], the provider is kept alive as we don't want to retry
   /// server errors immediately.
   Future<U> withAggregatorCacheFor<U>(
-    Future<U> Function(LichessClient, Aggregator) fn,
+    Future<U> Function(AppHttpClient, Aggregator) fn,
     Duration duration,
   ) async {
     final link = keepAlive();
     final timer = Timer(duration, link.close);
-    final client = read(lichessClientProvider);
+    final client = read(appHttpClientProvider);
     final aggregator = read(aggregatorProvider);
     onDispose(() {
       timer.cancel();

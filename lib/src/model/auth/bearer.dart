@@ -3,7 +3,7 @@ import 'package:crypto/crypto.dart';
 
 import 'package:nf_base/src/constants.dart';
 
-final hmacSha1 = Hmac(sha1, utf8.encode(kLichessWSSecret));
+final hmacSha1 = Hmac(sha1, utf8.encode(kAppWSSecret));
 
 /// Sign a bearer token with the lichess secret.
 String signBearerToken(String token) {

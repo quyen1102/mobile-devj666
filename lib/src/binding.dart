@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// A singleton class that provides access to plugins and external APIs.
 ///
 /// Only one instance of this class will be created during the app's lifetime.
-/// See [AppLichessBinding] for the concrete implementation.
+/// See [AppBinding] for the concrete implementation.
 ///
 /// Modeled after the Flutter framework's [WidgetsBinding] class.
 ///
@@ -18,14 +18,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// the behavior of the fake.
 /// However, if the plugin is used in a way that doesn't allow for easy mocking
 /// with riverpod, a test binding can be used to provide a fake implementation.
-abstract class LichessBinding {
-  LichessBinding() : assert(_instance == null) {
+abstract class BaseAppBinding {
+  BaseAppBinding() : assert(_instance == null) {
     initInstance();
   }
 
-  /// The single instance of [LichessBinding].
-  static LichessBinding get instance => checkInstance(_instance);
-  static LichessBinding? _instance;
+  /// The single instance of [BaseAppBinding].
+  static BaseAppBinding get instance => checkInstance(_instance);
+  static BaseAppBinding? _instance;
 
   @protected
   @mustCallSuper
@@ -33,17 +33,17 @@ abstract class LichessBinding {
     _instance = this;
   }
 
-  static T checkInstance<T extends LichessBinding>(T? instance) {
+  static T checkInstance<T extends BaseAppBinding>(T? instance) {
     assert(() {
       if (instance == null) {
         throw FlutterError.fromParts([
-          ErrorSummary('Lichess binding has not yet been initialized.'),
+          ErrorSummary('App binding has not yet been initialized.'),
           ErrorHint(
-            'In the app, this is done by the `AppLichessBinding.ensureInitialized()` call '
+            'In the app, this is done by the `AppBinding.ensureInitialized()` call '
             'in the `void main()` method.',
           ),
           ErrorHint(
-            'In a test, one can call `TestLichessBinding.ensureInitialized()` as the '
+            'In a test, one can call `TestAppBinding.ensureInitialized()` as the '
             "first line in the test's `main()` method to initialize the binding.",
           ),
         ]);
@@ -85,19 +85,19 @@ abstract class LichessBinding {
   void firebaseMessagingOnBackgroundMessage(BackgroundMessageHandler handler);
 }
 
-/// A concrete implementation of [LichessBinding] for the app.
-class AppLichessBinding extends LichessBinding {
-  AppLichessBinding();
+/// A concrete implementation of [BaseAppBinding] for the app.
+class AppBinding extends BaseAppBinding {
+  AppBinding();
 
-  /// Returns an instance of the binding that implements [LichessBinding].
+  /// Returns an instance of the binding that implements [BaseAppBinding].
   ///
-  /// If no binding has yet been initialized, the [AppLichessBinding] class is
+  /// If no binding has yet been initialized, the [AppBinding] class is
   /// used to create and initialize one.
-  factory AppLichessBinding.ensureInitialized() {
-    if (LichessBinding._instance == null) {
-      AppLichessBinding();
+  factory AppBinding.ensureInitialized() {
+    if (BaseAppBinding._instance == null) {
+      AppBinding();
     }
-    return LichessBinding.instance as AppLichessBinding;
+    return BaseAppBinding.instance as AppBinding;
   }
 
   late Future<SharedPreferencesWithCache> _sharedPreferencesWithCache;
@@ -109,11 +109,11 @@ class AppLichessBinding extends LichessBinding {
       throw FlutterError.fromParts([
         ErrorSummary('Shared preferences have not yet been preloaded.'),
         ErrorHint(
-          'In the app, this is done by the `await AppLichessBinding.preloadSharedPreferences()` call '
+          'In the app, this is done by the `await AppBinding.preloadSharedPreferences()` call '
           'in the `Future<void> main()` method.',
         ),
         ErrorHint(
-          'In a test, one can call `TestLichessBinding.setInitialSharedPreferencesValues({})` as the '
+          'In a test, one can call `TestAppBinding.setInitialSharedPreferencesValues({})` as the '
           "first line in the test's `main()` method.",
         ),
       ]);

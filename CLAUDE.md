@@ -455,3 +455,16 @@ dart devtools
 # Then run app and follow printed link
 flutter run
 ```
+
+## UI Style Preservation & Component Reuse Rules
+
+When working with this repository, strict boundaries must be maintained to keep the UI layout, styling, and design system identical to the base codebase:
+
+- **Component & Style Reuse**: Always build interfaces quickly by reusing widgets in `lib/src/widgets/` and style presets in `lib/src/styles/styles.dart`. This ensures consistency and accelerates frontend development.
+- **TabBar & Settings Preservation**: The TabBar navigation shell ([tab_scaffold.dart]) and Settings flows/models (under `lib/src/view/settings/` and `lib/src/model/settings/`) are core structural elements and must be preserved exactly as inherited. Only swap the screen contents and business logic.
+- **Modifiable branding**: You are only allowed to customize `brandSeedColor` inside `_makeDefaultTheme` in `lib/src/theme.dart`. App name, launcher icons, package names, and raw view business logic are also customizable.
+- **Strictly Read-Only UI**: Do not modify files in `lib/src/styles/` (e.g. `styles.dart`, `lichess_colors.dart`).
+- **No raw Flutter UI replacements**: Never replace the adaptive widgets in `lib/src/widgets/` (such as `PlatformScaffold`, `PlatformAppBar`) with raw Flutter `Scaffold` or `CupertinoPageScaffold`.
+- **No hardcoded colors**: Never use hardcoded hex colors or standard `Colors` classes for visual elements. Always read colors through the theme context: `Theme.of(context).colorScheme.*` or `context.lichessColors.*` to support light/dark mode.
+
+

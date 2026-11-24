@@ -13,7 +13,7 @@ final accountProvider = FutureProvider.autoDispose<User?>((Ref ref) {
 
 /// A provider for the [AccountRepository].
 final accountRepositoryProvider = Provider<AccountRepository>((ref) {
-  final client = ref.watch(lichessClientProvider);
+  final client = ref.watch(appHttpClientProvider);
   final aggregator = ref.watch(aggregatorProvider);
   return AccountRepository(client, aggregator);
 }, name: 'AccountRepositoryProvider');
@@ -21,7 +21,7 @@ final accountRepositoryProvider = Provider<AccountRepository>((ref) {
 class AccountRepository {
   AccountRepository(this.client, this.aggregator);
 
-  final LichessClient client;
+  final AppHttpClient client;
   final Aggregator aggregator;
 
   Future<User> getProfile() {

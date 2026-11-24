@@ -12,13 +12,13 @@ import 'package:nf_base/src/network/http.dart';
 
 Future<void> main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  final lichessBinding = AppLichessBinding.ensureInitialized();
+  final appBinding = AppBinding.ensureInitialized();
 
   // Show splash screen until app is ready
   // See src/app.dart for splash screen removal
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  await lichessBinding.preloadSharedPreferences();
+  await appBinding.preloadSharedPreferences();
 
   await initializeApp();
 
@@ -29,7 +29,7 @@ Future<void> main() async {
   await initializeLocalNotifications(locale);
 
   if (defaultTargetPlatform != TargetPlatform.linux) {
-    await lichessBinding.initializeFirebase();
+    await appBinding.initializeFirebase();
   }
 
   if (defaultTargetPlatform == TargetPlatform.android) {

@@ -102,7 +102,7 @@ class SocketPingRatingListTile extends ConsumerWidget {
             ),
       enabled: ping.averageLag > Duration.zero,
       onTap: () {
-        launchUrl(Uri.parse('https://lichess.org/lag'));
+        launchUrl(Uri.parse('https://example.com'));
       },
     );
   }

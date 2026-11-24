@@ -2,7 +2,7 @@ name: nf_base
 description: Lichess mobile app V2
 publish_to: "none"
 
-version: 0.24.6+002406 # See README.md for details about versioning
+version: 0.24.8+002408 # See README.md for details about versioning
 
 environment:
   sdk: ^3.11.5
@@ -105,10 +105,6 @@ flutter:
   assets:
     - assets/images/
 
-  fonts:
-    - family: SocialIcons
-      fonts:
-        - asset: assets/fonts/SocialIcons.ttf
 
   # Enable generation of localized Strings from arb files.
   generate: true

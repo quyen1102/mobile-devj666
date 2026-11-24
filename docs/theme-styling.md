@@ -62,3 +62,13 @@ To match iOS typography:
 1. **Never hardcode hex colors** directly in view components. Use `Theme.of(context).colorScheme.primary` (or other semantically mapped colors).
 2. **Support Dark Mode**: Ensure all custom layouts reference the correct context-dependent theme variables.
 3. **Use custom extensions** instead of creating multiple global constants for row/container styling.
+4. **Integration with Localization (i18n)**: Always pair dynamic styling changes with localization using `context.l10n` (declared in `lib/src/utils/l10n_context.dart`) to support both light/dark theme shifts and multiple languages seamlessly.
+
+---
+
+## Refactoring & Compliance Status
+
+The core user interfaces have been fully audited and refactored to ensure strict adherence to styling and localization rules:
+
+- **Onboarding Flow** (`onboarding_screen.dart`, `onboarding_pages_1.dart`, `onboarding_pages_2.dart`): Removed fallback forced dark wrapping, allowing pages to dynamically render under the active system theme (light/dark/custom background). All string literals have been moved to `.arb` locale dictionaries.
+- **Main View Tabs** (`home_tab_screen.dart`, `history_tab_screen.dart`, `progress_tab_screen.dart`): Replaced direct color calls with theme color scheme tokens (such as `colorScheme.surfaceContainer` and `colorScheme.onSurfaceVariant`) to prevent visual glitches on custom image background themes and Sepia/Light modes. All user-visible strings are localized using `context.l10n`.

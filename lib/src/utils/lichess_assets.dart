@@ -11,13 +11,13 @@ String _generateRandomString(int len) {
 final String _assetHash = '_${_generateRandomString(6)}';
 
 String lichessAssetUrl(String path) {
-  return '$kLichessCDNHost/assets/$_assetHash/$path';
+  return '$kAppCDNHost/assets/$_assetHash/$path';
 }
 
 String lichessFlagSrc(String country) {
-  return '$kLichessCDNHost/assets/flags/$country.png';
+  return '$kAppCDNHost/assets/flags/$country.png';
 }
 
 String lichessFlairSrc(String flair) {
-  return '$kLichessCDNHost/assets/flair/img/$flair.webp';
+  return '$kAppCDNHost/assets/flair/img/$flair.webp';
 }

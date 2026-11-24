@@ -52,21 +52,21 @@ final _globalStreamController = StreamController<SocketEvent>.broadcast();
 /// - 'challenges'
 final socketGlobalStream = _globalStreamController.stream;
 
-/// Creates a WebSocket URI for the lichess server.
-Uri lichessWSUri(String unencodedPath, [Map<String, String>? queryParameters]) =>
-    kLichessWSHost.startsWith('localhost') ||
-        kLichessWSHost.startsWith('10.') ||
-        kLichessWSHost.startsWith('192.168.')
+/// Creates a WebSocket URI for the app server.
+Uri appWSUri(String unencodedPath, [Map<String, String>? queryParameters]) =>
+    kAppWSHost.startsWith('localhost') ||
+        kAppWSHost.startsWith('10.') ||
+        kAppWSHost.startsWith('192.168.')
     ? Uri(
         scheme: 'ws',
-        host: kLichessWSHost.split(':')[0],
-        port: int.parse(kLichessWSHost.split(':')[1]),
+        host: kAppWSHost.split(':')[0],
+        port: int.parse(kAppWSHost.split(':')[1]),
         path: unencodedPath,
         queryParameters: queryParameters,
       )
     : Uri(
         scheme: 'wss',
-        host: kLichessWSHost,
+        host: kAppWSHost,
         path: unencodedPath,
         queryParameters: queryParameters,
       );
@@ -212,7 +212,7 @@ class SocketClient {
     _ackResendTimer = Timer.periodic(resendAckDelay, (_) => _resendAcks());
 
     final authUser = getSession();
-    final uri = lichessWSUri(route.path, version != null ? {'v': version.toString()} : null);
+    final uri = appWSUri(route.path, version != null ? {'v': version.toString()} : null);
     final Map<String, String> headers = authUser != null
         ? {'Authorization': 'Bearer ${signBearerToken(authUser.token)}'}
         : {};
@@ -381,7 +381,7 @@ class SocketClient {
           _logger.severe(
             'Cannot solve event gap: version incoming ${event.version} vs current $version',
           );
-          LichessBinding.instance.firebaseCrashlytics.recordError(
+          BaseAppBinding.instance.firebaseCrashlytics.recordError(
             'Cannot solve event gap: version incoming ${event.version} vs current $version',
             null,
             information: ['socket.route: $route', 'event.topic: ${event.topic}'],

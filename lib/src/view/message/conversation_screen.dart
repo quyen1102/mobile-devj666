@@ -401,7 +401,7 @@ class _MessageBubble extends ConsumerWidget {
               Linkify(
                 onOpen: (link) async =>
                     await ref.read(appLinksServiceProvider).onLinkifyOpen(context, link),
-                linkifiers: AppLinksService.kLichessLinkifiers,
+                linkifiers: AppLinksService.kAppLinkifiers,
                 text: message.text,
                 style: TextStyle(color: _textColor(context)),
                 linkStyle: Styles.linkStyle,

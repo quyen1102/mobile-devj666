@@ -18,7 +18,7 @@ const _kOAuthCustomSchemeCallbackHost = 'login-callback';
 ///
 /// Custom schemes are more universally supported across Android browsers/OEMs than
 /// HTTPS App Link redirects, so they are used on every platform and host.
-const kOAuthRedirectUri = '$kLichessCustomUriSchemeName://$_kOAuthCustomSchemeCallbackHost';
+const kOAuthRedirectUri = '$kAppCustomUriSchemeName://$_kOAuthCustomSchemeCallbackHost';
 const oauthScopes = ['web:mobile'];
 
 /// Thrown when the user dismisses the OAuth session before completing it.
@@ -49,7 +49,7 @@ class AuthRepository {
   final Logger _log = Logger('AuthRepository');
   final FlutterAppAuth _appAuth;
 
-  LichessClient get _client => _ref.read(lichessClientProvider);
+  AppHttpClient get _client => _ref.read(appHttpClientProvider);
 
   /// Sign in with Lichess using OAuth 2.0 PKCE.
   ///
@@ -63,12 +63,12 @@ class AuthRepository {
     try {
       authResp = await _appAuth.authorizeAndExchangeCode(
         AuthorizationTokenRequest(
-          kLichessClientId,
+          kAppClientId,
           kOAuthRedirectUri,
           allowInsecureConnections: kDebugMode,
           serviceConfiguration: AuthorizationServiceConfiguration(
-            authorizationEndpoint: lichessUri('/oauth').toString(),
-            tokenEndpoint: lichessUri('/api/token').toString(),
+            authorizationEndpoint: appUri('/oauth').toString(),
+            tokenEndpoint: appUri('/api/token').toString(),
           ),
           scopes: oauthScopes,
         ),
@@ -104,7 +104,7 @@ class AuthRepository {
   Future<bool> checkToken(AuthUser authUser) async {
     final defaultClient = _ref.read(defaultClientProvider);
     final data = await defaultClient
-        .postReadJson(lichessUri('/api/token/test'), mapper: (json) => json, body: authUser.token)
+        .postReadJson(appUri('/api/token/test'), mapper: (json) => json, body: authUser.token)
         .timeout(const Duration(seconds: 5));
     return data[authUser.token] != null;
   }

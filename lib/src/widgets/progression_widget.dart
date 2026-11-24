@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:nf_base/src/styles/lichess_icons.dart';
+import 'package:nf_base/src/styles/app_icons.dart';
 import 'package:nf_base/src/styles/styles.dart';
 
 const _customOpacity = 0.6;
@@ -13,12 +13,12 @@ class ProgressionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisSize: .min,
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (progress != 0) ...[
           Icon(
-            progress > 0 ? LichessIcons.arrow_full_upperright : LichessIcons.arrow_full_lowerright,
+            progress > 0 ? AppIcons.trendingUp : AppIcons.trendingDown,
             size: fontSize,
             color: progress > 0 ? context.lichessColors.good : context.lichessColors.error,
           ),

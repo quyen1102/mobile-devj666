@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nf_base/src/styles/lichess_colors.dart';
+import 'package:nf_base/src/widgets/adaptive_action_sheet.dart';
+import 'package:nf_base/src/widgets/adaptive_choice_picker.dart';
 import 'package:nf_base/src/widgets/buttons.dart';
-import 'package:nf_base/src/widgets/stat_card.dart';
-import 'package:nf_base/src/widgets/text_badge.dart';
+import 'package:nf_base/src/widgets/emoji_picker/emoji_picker.dart';
+import 'package:nf_base/src/widgets/emoji_picker/emoji_picker_configuration.dart';
+import 'package:nf_base/src/widgets/emoji_picker/emoji_picker_models.dart';
+import 'package:nf_base/src/widgets/empty_state_widget.dart';
+import 'package:nf_base/src/widgets/platform_avatar.dart';
+import 'package:nf_base/src/widgets/platform_card.dart';
+import 'package:nf_base/src/widgets/platform_date_picker.dart';
+import 'package:nf_base/src/widgets/platform_loading_overlay.dart';
+import 'package:nf_base/src/widgets/platform_switch_list_tile.dart';
+import 'package:nf_base/src/widgets/platform_text_field.dart';
 import 'package:nf_base/src/widgets/progression_widget.dart';
 import 'package:nf_base/src/widgets/shimmer.dart';
-import 'package:nf_base/src/widgets/adaptive_choice_picker.dart';
-import 'package:nf_base/src/widgets/adaptive_action_sheet.dart';
+import 'package:nf_base/src/widgets/stat_card.dart';
+import 'package:nf_base/src/widgets/text_badge.dart';
 import 'package:nf_base/src/widgets/yes_no_dialog.dart';
-import 'package:nf_base/src/widgets/emoji_picker/emoji_picker.dart';
-import 'package:nf_base/src/widgets/emoji_picker/emoji_picker_models.dart';
-import 'package:nf_base/src/widgets/emoji_picker/emoji_picker_configuration.dart';
-import 'package:nf_base/src/styles/lichess_colors.dart';
 
 class HomeTabScreen extends ConsumerStatefulWidget {
   const HomeTabScreen({super.key});
@@ -26,46 +33,51 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> with SingleTicker
   String _selectedChoice = 'Premium';
   String _selectedEmoji = 'None';
 
+  bool _switchVal = false;
+  DateTime? _selectedDate;
+  bool _showOverlay = false;
+  final _textController = TextEditingController();
+
   final List<String> _showcaseChoices = ['Standard', 'Premium', 'Ultimate', 'Enterprise'];
 
   // Mock EmojiData structure targeting standard web emojis
-  final EmojiData _mockEmojiData = EmojiData(
+  static const EmojiData _mockEmojiData = EmojiData(
     categories: [
-      const Category(id: 'smileys', name: 'Smileys', emojiIds: ['smile', 'wink', 'laugh']),
-      const Category(id: 'objects', name: 'Objects', emojiIds: ['heart', 'fire', 'thumbsup']),
+      Category(id: 'smileys', name: 'Smileys', emojiIds: ['smile', 'wink', 'laugh']),
+      Category(id: 'objects', name: 'Objects', emojiIds: ['heart', 'fire', 'thumbsup']),
     ],
     emojis: {
-      'smile': const Emoji(
+      'smile': Emoji(
         id: 'smile',
         name: 'Smile',
         keywords: {'smile', 'happy', 'face'},
         skins: [Skin(src: 'https://lichess1.org/assets/images/emoji/smile.png')],
       ),
-      'wink': const Emoji(
+      'wink': Emoji(
         id: 'wink',
         name: 'Wink',
         keywords: {'wink', 'face'},
         skins: [Skin(src: 'https://lichess1.org/assets/images/emoji/wink.png')],
       ),
-      'laugh': const Emoji(
+      'laugh': Emoji(
         id: 'laugh',
         name: 'Laughing',
         keywords: {'laugh', 'lol', 'happy'},
         skins: [Skin(src: 'https://lichess1.org/assets/images/emoji/laughing.png')],
       ),
-      'heart': const Emoji(
+      'heart': Emoji(
         id: 'heart',
         name: 'Heart',
         keywords: {'heart', 'love'},
         skins: [Skin(src: 'https://lichess1.org/assets/images/emoji/heart.png')],
       ),
-      'fire': const Emoji(
+      'fire': Emoji(
         id: 'fire',
         name: 'Fire',
         keywords: {'fire', 'hot', 'lit'},
         skins: [Skin(src: 'https://lichess1.org/assets/images/emoji/fire.png')],
       ),
-      'thumbsup': const Emoji(
+      'thumbsup': Emoji(
         id: 'thumbsup',
         name: 'Thumbs Up',
         keywords: {'thumbsup', 'yes', 'ok'},
@@ -77,12 +89,13 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> with SingleTicker
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _textController.dispose();
     super.dispose();
   }
 
@@ -99,6 +112,7 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> with SingleTicker
             Tab(icon: Icon(Icons.dashboard_customize), text: 'Components'),
             Tab(icon: Icon(Icons.ads_click), text: 'Pickers & Sheets'),
             Tab(icon: Icon(Icons.emoji_emotions), text: 'Emoji Picker'),
+            Tab(icon: Icon(Icons.star), text: 'Adaptive Widgets'),
           ],
         ),
       ),
@@ -108,6 +122,7 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> with SingleTicker
           _buildComponentsTab(theme),
           _buildPickersTab(theme),
           _buildEmojiPickerTab(theme),
+          _buildNewWidgetsTab(theme),
         ],
       ),
     );
@@ -118,13 +133,13 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> with SingleTicker
       padding: const EdgeInsets.all(16.0),
       children: [
         _buildSectionHeader(theme, 'Stat Cards (Grid Layout)'),
-        StatCardRow([
-          const StatCard(
+        const StatCardRow([
+          StatCard(
             'Active Users',
             value: '1,248',
             contentPadding: EdgeInsets.all(16.0),
           ),
-          const StatCard(
+          StatCard(
             'Status',
             value: 'Online',
             backgroundColor: Color(0x1F009688),
@@ -134,11 +149,11 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> with SingleTicker
         const SizedBox(height: 24),
 
         _buildSectionHeader(theme, 'Badges & Indicators'),
-        Wrap(
+        const Wrap(
           spacing: 12,
           runSpacing: 12,
           crossAxisAlignment: WrapCrossAlignment.center,
-          children: const [
+          children: [
             TextBadge(text: 'NEW', badgeColor: LichessColors.red),
             TextBadge(text: 'STABLE', badgeColor: LichessColors.brag),
             TextBadge(text: 'EXPERIMENTAL', badgeColor: Colors.white, textColor: Colors.black),
@@ -366,6 +381,120 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> with SingleTicker
       ),
     );
   }
+
+  Widget _buildNewWidgetsTab(ThemeData theme) {
+    return PlatformLoadingOverlay(
+      visible: _showOverlay,
+      message: 'Loading overlay demo...',
+      child: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          _buildSectionHeader(theme, 'Platform Card & Avatar'),
+          PlatformCard(
+            child: Row(
+              children: [
+                const PlatformAvatar(
+                  initials: 'JD',
+                  isOnline: true,
+                  size: 50,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'John Doe',
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const Text('Senior Flutter Developer'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          _buildSectionHeader(theme, 'Platform Input Elements'),
+          PlatformTextField(
+            controller: _textController,
+            hintText: 'Enter sample text...',
+            prefix: const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Icon(Icons.edit, size: 18),
+            ),
+          ),
+          const SizedBox(height: 12),
+          PlatformSwitchListTile(
+            value: _switchVal,
+            onChanged: (val) => setState(() => _switchVal = val),
+            title: const Text('Toggle Adaptive Setting'),
+            subtitle: const Text('Renders platform-native switch elements'),
+          ),
+          const SizedBox(height: 16),
+
+          _buildSectionHeader(theme, 'Platform Date Picker'),
+          PlatformCard(
+            onTap: () async {
+              final picked = await PlatformDatePicker.show(
+                context,
+                initialDate: _selectedDate ?? DateTime.now(),
+                firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                lastDate: DateTime.now().add(const Duration(days: 365)),
+              );
+              if (picked != null) {
+                setState(() => _selectedDate = picked);
+              }
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Pick a Date'),
+                Text(
+                  _selectedDate == null
+                      ? 'No date selected'
+                      : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          _buildSectionHeader(theme, 'Platform Loading Overlay Toggle'),
+          ElevatedButton(
+            onPressed: () {
+              setState(() => _showOverlay = true);
+              Future.delayed(const Duration(seconds: 2), () {
+                if (mounted) {
+                  setState(() => _showOverlay = false);
+                }
+              });
+            },
+            child: const Text('Trigger Blur Loading Overlay (2s)'),
+          ),
+          const SizedBox(height: 16),
+
+          _buildSectionHeader(theme, 'Empty State Widget'),
+          PlatformCard(
+            padding: EdgeInsets.zero,
+            child: EmptyStateWidget(
+              icon: Icon(Icons.inbox_outlined, size: 48, color: theme.colorScheme.secondary),
+              title: const Text('No Items Found'),
+              description: const Text('Get started by adding items to your list.'),
+              action: ElevatedButton(
+                onPressed: () {},
+                child: const Text('Create New Item'),
+              ),
+            ),
+          ),
+          const SizedBox(height: 200)
+        ],
+      ),
+    );
+  }
 }
-
-
